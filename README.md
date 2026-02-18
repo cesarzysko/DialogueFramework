@@ -6,7 +6,7 @@ This project is built as a programming skill–polishing exercise, focusing on c
 
 ---
 
-## Goals
+### Goals
 
 - Promote clean, maintainable architecture
 - Ensure high reusability across projects
@@ -15,7 +15,7 @@ This project is built as a programming skill–polishing exercise, focusing on c
 
 ---
 
-## Architecture Overview
+### Architecture Overview
 
 - **Core:**
   - Nodes
@@ -26,14 +26,16 @@ This project is built as a programming skill–polishing exercise, focusing on c
   - Dialogue Runner
 
 - **Frontend Layer**
-  - Console / Text Adventure (current sample)
+  - Console (Text Adventure sample)
   - Unity (planned)
   - MonoGame (planned)
+
 ---
 
-## Roadmap
+### Roadmap
 
-- Dialogue graph serialization support
+- Dialogue framework core - **Done**
+- Dialogue graph serialization support - **In Progress**
 - Save / Load runtime state
 - Dialogue editing
 - Unity adapter layer
