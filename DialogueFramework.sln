@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DialogueFramework", "DialogueFramework\DialogueFramework.csproj", "{F2DF1ED9-6B39-44E9-8F72-F1421B642487}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DialogueFramework.Tests.XUnit", "DialogueFramework.Tests.XUnit\DialogueFramework.Tests.XUnit.csproj", "{4467C4BA-EFD1-487D-B4A7-85A9AA17305C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextAdventure", "TextAdventure\TextAdventure.csproj", "{81E0817E-7B34-45E4-AC2B-93980DDC5786}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F2DF1ED9-6B39-44E9-8F72-F1421B642487}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2DF1ED9-6B39-44E9-8F72-F1421B642487}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2DF1ED9-6B39-44E9-8F72-F1421B642487}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2DF1ED9-6B39-44E9-8F72-F1421B642487}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4467C4BA-EFD1-487D-B4A7-85A9AA17305C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4467C4BA-EFD1-487D-B4A7-85A9AA17305C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4467C4BA-EFD1-487D-B4A7-85A9AA17305C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4467C4BA-EFD1-487D-B4A7-85A9AA17305C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81E0817E-7B34-45E4-AC2B-93980DDC5786}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81E0817E-7B34-45E4-AC2B-93980DDC5786}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81E0817E-7B34-45E4-AC2B-93980DDC5786}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81E0817E-7B34-45E4-AC2B-93980DDC5786}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

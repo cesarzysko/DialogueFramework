@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>12</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+
+      <AdditionalFiles Include="$(SolutionDir)Config\stylecop.json">
+        <Link>Config\stylecop.json</Link>
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </AdditionalFiles>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\Config\DialogueFramework.csproj.DotSettings">
+        <Link>Config\DialogueFramework.csproj.DotSettings</Link>
+      </None>
+    </ItemGroup>
+
+</Project>
