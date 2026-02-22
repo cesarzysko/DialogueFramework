@@ -5,31 +5,70 @@
 namespace DialogueFramework;
 
 /// <summary>
-/// Defines a common immutable type for storing dialogue nodes.
+/// An immutable dictionary of dialogue nodes, indexed by their internal <see cref="NodeId"/>, used by
+/// <see cref="DialogueRunner{TRegistryKey,TDialogueContent,TChoiceContent}"/> to resolve choice targets during
+/// traversal.
 /// </summary>
-/// <param name="nodes">The dialogue nodes to store.</param>
-/// <typeparam name="TDialogueContent">The type of the content which the dialogue node holds and displays.</typeparam>
-/// <typeparam name="TChoiceContent">The type of the content which the dialogue choice holds and displays.</typeparam>
-internal sealed class DialogueGraph<TDialogueContent, TChoiceContent>(
-    IEnumerable<IDialogueNode<TDialogueContent, TChoiceContent>> nodes)
+/// <typeparam name="TRegistryKey">
+/// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
+/// </typeparam>
+/// <typeparam name="TDialogueContent">
+/// The type of displayable data carried by each node.
+/// </typeparam>
+/// <typeparam name="TChoiceContent">
+/// The type of displayable data carried by each choice.
+/// </typeparam>
+internal sealed class DialogueGraph<TRegistryKey, TDialogueContent, TChoiceContent>
+    where TRegistryKey : notnull
 {
-    private Dictionary<int, IDialogueNode<TDialogueContent, TChoiceContent>> Nodes { get; } = CreateGraph(nodes);
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DialogueGraph{TRegistryKey, TDialogueContent, TChoiceContent}"/>
+    /// class.
+    /// </summary>
+    /// <param name="nodes">
+    /// The complete set of nodes that form the dialogue graph. All node IDs must be unique.
+    /// </param>
+    /// <exception cref="ArgumentException">
+    /// Thrown if any two nodes in <paramref name="nodes"/> share the same <see cref="NodeId"/>.
+    /// </exception>
+    internal DialogueGraph(IEnumerable<IDialogueNode<TRegistryKey, TDialogueContent, TChoiceContent>> nodes)
+    {
+        this.Nodes = CreateGraph(nodes);
+    }
+
+    private Dictionary<int, IDialogueNode<TRegistryKey, TDialogueContent, TChoiceContent>> Nodes { get; }
 
     /// <summary>
-    /// Gets the dialogue node with the given id.
+    /// Retrieves the node with the given internal identifier.
     /// </summary>
-    /// <param name="id">The id of the dialogue node which needs to be retrieved.</param>
-    /// <returns>The dialogue node with the given id.</returns>
+    /// <param name="id">
+    /// The internal identifier of the node to retrieve.
+    /// </param>
+    /// <returns>
+    /// The node corresponding to <paramref name="id"/>.
+    /// </returns>
     /// <exception cref="KeyNotFoundException">
-    /// Thrown when the given id does not correspond to any dialogue node in the dialogue graph.
+    /// Thrown when no node with the given <paramref name="id"/> exists in the graph.
     /// </exception>
-    public IDialogueNode<TDialogueContent, TChoiceContent> GetDialogueNode(NodeId id)
+    public IDialogueNode<TRegistryKey, TDialogueContent, TChoiceContent> GetDialogueNode(NodeId id)
     {
         return this.Nodes[id.Value];
     }
 
-    private static Dictionary<int, IDialogueNode<TDialogueContent, TChoiceContent>> CreateGraph(
-        IEnumerable<IDialogueNode<TDialogueContent, TChoiceContent>> nodes)
+    /// <summary>
+    /// Converts the flat sequence of nodes into a dictionary keyed by node ID.
+    /// </summary>
+    /// <param name="nodes">
+    /// The nodes to index.
+    /// </param>
+    /// <returns>
+    /// A dictionary from raw integer ID to node.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when two or more nodes share the same <see cref="NodeId"/>.
+    /// </exception>
+    private static Dictionary<int, IDialogueNode<TRegistryKey, TDialogueContent, TChoiceContent>> CreateGraph(
+        IEnumerable<IDialogueNode<TRegistryKey, TDialogueContent, TChoiceContent>> nodes)
     {
         try
         {

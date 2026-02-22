@@ -5,28 +5,34 @@
 namespace DialogueFramework;
 
 /// <summary>
-/// An interface to be used to handle a dialogue choice.
+/// Represents a single selectable choice within a dialogue node.
 /// </summary>
-/// <typeparam name="TContent">The type of the content which the dialogue choice holds and displays.</typeparam>
-public interface IDialogueChoice<out TContent>
+/// <typeparam name="TRegistryKey">
+/// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
+/// </typeparam>
+/// <typeparam name="TContent">
+/// The type of displayable data attached to the choice.
+/// </typeparam>
+public interface IDialogueChoice<out TRegistryKey, out TContent>
+    where TRegistryKey : notnull
 {
     /// <summary>
-    /// Gets the displayable content of the choice.
+    /// Gets the data to display when presenting this choice to the user.
     /// </summary>
     public TContent? Content { get; }
 
     /// <summary>
-    /// Gets the target id of the next dialogue node, null if none.
+    /// Gets the internal identifier of the node this choice leads to.
     /// </summary>
     internal NodeId? Target { get; }
 
     /// <summary>
-    /// Gets the condition for the dialogue choice to be available.
+    /// Gets the condition that must be satisfied for this choice to appear as available.
     /// </summary>
-    internal ICondition? Condition { get; }
+    internal ICondition<TRegistryKey>? Condition { get; }
 
     /// <summary>
-    /// Gets the action performed upon selecting the dialogue choice.
+    /// Gets the action executed by the runner when this choice is selected.
     /// </summary>
-    internal IAction? Action { get; }
+    internal IAction<TRegistryKey>? Action { get; }
 }

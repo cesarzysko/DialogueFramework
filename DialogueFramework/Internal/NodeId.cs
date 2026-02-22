@@ -5,12 +5,6 @@
 namespace DialogueFramework;
 
 /// <summary>
-/// Defines a common immutable type for referencing dialogue nodes.
+/// A lightweight integer identifier assigned to a dialogue node by the framework at build time.
 /// </summary>
-internal readonly record struct NodeId(int Value)
-{
-    /// <summary>
-    /// Gets a direct identifier to a node.
-    /// </summary>
-    public int Value { get; } = Value;
-}
+internal readonly record struct NodeId(int Value);

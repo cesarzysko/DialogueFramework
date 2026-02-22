@@ -5,29 +5,54 @@
 namespace DialogueFramework;
 
 /// <summary>
-/// Defines a common immutable type for defining dialogue choices.
+/// An immutable, internal implementation of <see cref="IDialogueChoice{TRegistryKey,TContent}"/>.
 /// </summary>
-/// <param name="content">The displayable content of the choice.</param>
-/// <param name="target">The target id of the next dialogue node, null if none.</param>
-/// <param name="condition">The condition for the dialogue choice to be available.</param>
-/// <param name="action">The action performed upon selecting the dialogue choice.</param>
-/// <typeparam name="TContent">The type of the content which the dialogue choice holds and displays.</typeparam>
-internal sealed class DialogueChoice<TContent>(
-    TContent? content,
-    NodeId? target = null,
-    ICondition? condition = null,
-    IAction? action = null)
-    : IDialogueChoice<TContent>
+/// <typeparam name="TRegistryKey">
+/// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
+/// </typeparam>
+/// <typeparam name="TContent">
+/// The type of displayable data carried by this choice.
+/// </typeparam>
+internal sealed class DialogueChoice<TRegistryKey, TContent>
+    : IDialogueChoice<TRegistryKey, TContent>
+    where TRegistryKey : notnull
 {
-    /// <inheritdoc/>
-    TContent? IDialogueChoice<TContent>.Content { get; } = content;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DialogueChoice{TRegistryKey, TContent}"/> class.
+    /// </summary>
+    /// <param name="content">
+    /// The data to display when presenting this choice to the user.
+    /// </param>
+    /// <param name="target">
+    /// The internal identifier of the node this choice leads to.
+    /// </param>
+    /// <param name="condition">
+    /// The predicate evaluated to determine whether this choice is available.
+    /// </param>
+    /// <param name="action">
+    /// The effect executed when this choice is selected.
+    /// </param>
+    internal DialogueChoice(
+        TContent? content,
+        NodeId? target = null,
+        ICondition<TRegistryKey>? condition = null,
+        IAction<TRegistryKey>? action = null)
+    {
+        this.Content = content;
+        this.Target = target;
+        this.Condition = condition;
+        this.Action = action;
+    }
 
     /// <inheritdoc/>
-    NodeId? IDialogueChoice<TContent>.Target { get; } = target;
+    public TContent? Content { get; }
 
     /// <inheritdoc/>
-    ICondition? IDialogueChoice<TContent>.Condition { get; } = condition;
+    public NodeId? Target { get; }
 
     /// <inheritdoc/>
-    IAction? IDialogueChoice<TContent>.Action { get; } = action;
+    public ICondition<TRegistryKey>? Condition { get; }
+
+    /// <inheritdoc/>
+    public IAction<TRegistryKey>? Action { get; }
 }

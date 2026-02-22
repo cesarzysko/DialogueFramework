@@ -7,41 +7,27 @@ namespace DialogueFramework.Tests.XUnit;
 /// <summary>
 /// Action that modifies a player resource.
 /// </summary>
-public class ModifyResourceAction : IAction
+/// <typeparam name="TRegistryKey">The type key used to identify values in the registry.</typeparam>
+public class ModifyResourceAction<TRegistryKey> : IAction<TRegistryKey>
+    where TRegistryKey : notnull
 {
-    private readonly ResourceType resourceType;
+    private readonly ValueHandle<int> resourceHandle;
     private readonly int amount;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ModifyResourceAction"/> class.
+    /// Initializes a new instance of the <see cref="ModifyResourceAction{TRegistryKey}"/> class.
     /// </summary>
-    /// <param name="resourceType">The resource to modify.</param>
+    /// <param name="resourceHandle">The resource to modify.</param>
     /// <param name="amount">The amount of resource to modify.</param>
-    public ModifyResourceAction(ResourceType resourceType, int amount)
+    public ModifyResourceAction(ValueHandle<int> resourceHandle, int amount)
     {
-        this.resourceType = resourceType;
+        this.resourceHandle = resourceHandle;
         this.amount = amount;
     }
 
-    /// <exception cref="ArgumentOutOfRangeException">Throws when the provided resource type is not handled by this action.</exception>
     /// <inheritdoc/>
-    public void Execute(IVariableStore? variables)
+    public void Execute(IValueRegistry<TRegistryKey>? valueRegistry)
     {
-        if (variables == null)
-        {
-            return;
-        }
-
-        if (this.resourceType is not (ResourceType.Health or ResourceType.Mana or ResourceType.Gold))
-        {
-            return;
-        }
-
-        if (!variables.TryGet(this.resourceType, out int resourceValue))
-        {
-            return;
-        }
-
-        variables.TrySet(this.resourceType, resourceValue + this.amount);
+        valueRegistry?.Set(this.resourceHandle, valueRegistry.Get(this.resourceHandle) + this.amount);
     }
 }

@@ -15,9 +15,9 @@ public class DialogueBranchingTests
     [Fact]
     public void Dialogue_BranchIntoB_Correctly()
     {
-        IDialogueRunner<string, string> runner = GetDialogueRunner();
+        IDialogueRunner<string, string, string> runner = GetDialogueRunner();
 
-        Assert.Equal("Welcome, traveler.", runner.Current.Content);
+        Assert.Equal("Welcome, traveler.", runner.Current?.Content);
 
         // A1 --> A2
         var choicesA1 = runner.GetAvailableChoices();
@@ -25,7 +25,7 @@ public class DialogueBranchingTests
 
         bool a2ChooseSuccess = runner.Choose(choicesA1[0]);
         Assert.True(a2ChooseSuccess);
-        Assert.Equal("You arrive at the crossroads.", runner.Current.Content);
+        Assert.Equal("You arrive at the crossroads.", runner.Current?.Content);
 
         // A2 --> B1
         var choicesA2 = runner.GetAvailableChoices();
@@ -33,7 +33,7 @@ public class DialogueBranchingTests
 
         bool b1ChooseSuccess = runner.Choose(choicesA2[0]);
         Assert.True(b1ChooseSuccess);
-        Assert.Equal("You encounter a peaceful village.", runner.Current.Content);
+        Assert.Equal("You encounter a peaceful village.", runner.Current?.Content);
 
         // B1 --> END
         var choicesB1 = runner.GetAvailableChoices();
@@ -49,9 +49,9 @@ public class DialogueBranchingTests
     [Fact]
     public void Dialogue_BranchIntoC_Correctly()
     {
-        IDialogueRunner<string, string> runner = GetDialogueRunner();
+        IDialogueRunner<string, string, string> runner = GetDialogueRunner();
 
-        Assert.Equal("Welcome, traveler.", runner.Current.Content);
+        Assert.Equal("Welcome, traveler.", runner.Current?.Content);
 
         // A1 --> A2
         var choicesA1 = runner.GetAvailableChoices();
@@ -59,7 +59,7 @@ public class DialogueBranchingTests
 
         bool a2ChooseSuccess = runner.Choose(choicesA1[0]);
         Assert.True(a2ChooseSuccess);
-        Assert.Equal("You arrive at the crossroads.", runner.Current.Content);
+        Assert.Equal("You arrive at the crossroads.", runner.Current?.Content);
 
         // A2 --> C1
         var choicesA2 = runner.GetAvailableChoices();
@@ -67,7 +67,7 @@ public class DialogueBranchingTests
 
         bool c1ChooseSuccess = runner.Choose(choicesA2[1]);
         Assert.True(c1ChooseSuccess);
-        Assert.Equal("You walk into a dark forest.", runner.Current.Content);
+        Assert.Equal("You walk into a dark forest.", runner.Current?.Content);
 
         // C1 --> END
         var choicesC1 = runner.GetAvailableChoices();
@@ -77,9 +77,9 @@ public class DialogueBranchingTests
         Assert.False(endChooseSuccess);
     }
 
-    private static IDialogueRunner<string, string> GetDialogueRunner()
+    private static IDialogueRunner<string, string, string> GetDialogueRunner()
     {
-        return DialogueBuilderFactory.CreateBuilder<string, string, string>()
+        return DialogueBuilderFactory.CreateBuilder<string, string, string, string>()
             .AddLinearNode(StringIds.MsgA1, "Welcome, traveler.", StringIds.MsgA2, "Continue")
             .AddMultiChoiceNode(StringIds.MsgA2, "You arrive at the crossroads.")
                 .WithChoice(StringIds.MsgB1, "Take the left path.")
@@ -87,7 +87,7 @@ public class DialogueBranchingTests
             .EndNode()
             .AddTerminalNode(StringIds.MsgB1, "You encounter a peaceful village.")
             .AddTerminalNode(StringIds.MsgC1, "You walk into a dark forest.")
-            .Build(null, StringIds.MsgA1);
+            .BuildRunner(null, StringIds.MsgA1);
     }
 
     private static class StringIds

@@ -21,13 +21,12 @@ public static class AdventureProvider
     /// <summary>
     /// Builds the runner for the adventure.
     /// </summary>
-    /// <param name="state">The starting state of the player.</param>
     /// <param name="startingSceneId">The starting place of the adventure.</param>
     /// <param name="logger">The optional logger used to print out internal messages.</param>
     /// <returns>The runner instance for the adventure.</returns>
-    public static IDialogueRunner<string, string> BuildAdventure(PlayerState state, SceneId startingSceneId = SceneId.Intro, ILogger? logger = null)
+    public static IDialogueRunner<string, string, string> BuildAdventure(SceneId startingSceneId = SceneId.Intro, ILogger? logger = null)
     {
-        return DialogueBuilderFactory.CreateBuilder<SceneId, string, string>(logger)
+        return DialogueBuilderFactory.CreateBuilder<string, SceneId, string, string>(logger)
 
             // ===  INTRO ===
             .AddLinearNode(
@@ -52,15 +51,15 @@ public static class AdventureProvider
                 .WithChoice(
                     SceneId.FightGoblin,
                     $"{AttackLabel}Fight the goblin.",
-                    action: new ModifyResourceAction(ResourceType.Health, -15))
+                    action: new ModifyResourceAction<string>(ValueRegistry.Health, -15))
                 .WithChoice(
                     SceneId.CastFireballOnGoblin,
                     $"{SpellLabel}Cast a fireball on the goblin.",
-                    action: new ModifyResourceAction(ResourceType.Mana, -20))
+                    action: new ModifyResourceAction<string>(ValueRegistry.Mana, -20))
                 .WithChoice(
                     SceneId.BribeGoblin,
                     $"{BribeLabel}Offer some gold to the goblin.",
-                    action: new ModifyResourceAction(ResourceType.Gold, -999_999))
+                    action: new ModifyResourceAction<string>(ValueRegistry.Gold, -999_999))
                 .WithChoice(
                     SceneId.RunAway,
                     $"{FleeLabel}Run back to the entrance.")
@@ -100,9 +99,9 @@ public static class AdventureProvider
                 .WithChoice(
                     SceneId.DrinkFromFountain,
                     $"{DrinkLabel}Drink from the fountain.",
-                    action: new CompositeAction(
-                        new ModifyResourceAction(ResourceType.Health, 30),
-                        new ModifyResourceAction(ResourceType.Mana, 20)))
+                    action: new CompositeAction<string>(
+                        new ModifyResourceAction<string>(ValueRegistry.Health, 30),
+                        new ModifyResourceAction<string>(ValueRegistry.Mana, 20)))
                 .WithChoice(
                     SceneId.IgnoreFountain,
                     $"{IgnoreLabel}Leave the fountain alone.")
@@ -126,21 +125,21 @@ public static class AdventureProvider
                 .WithChoice(
                     SceneId.PhysicalAttackDragon,
                     $"{AttackLabel} Fight the dragon.",
-                    action: new CompositeAction(
-                        new ModifyResourceAction(ResourceType.Health, -90),
-                        new ModifyResourceAction(ResourceType.Gold, 150)))
+                    action: new CompositeAction<string>(
+                        new ModifyResourceAction<string>(ValueRegistry.Health, -90),
+                        new ModifyResourceAction<string>(ValueRegistry.Gold, 150)))
                 .WithChoice(
                     SceneId.MagicAttackDragon,
                     $"{SpellLabel}Cast a powerful spell.",
-                    condition: new HasMinimumResourceCondition(ResourceType.Mana, 100),
-                    action: new CompositeAction(
-                        new ModifyResourceAction(ResourceType.Mana, -100),
-                        new ModifyResourceAction(ResourceType.Gold, 200)))
+                    condition: new HasMinimumResourceCondition<string>(ValueRegistry.Mana, 100),
+                    action: new CompositeAction<string>(
+                        new ModifyResourceAction<string>(ValueRegistry.Mana, -100),
+                        new ModifyResourceAction<string>(ValueRegistry.Gold, 200)))
                 .WithChoice(
                     SceneId.PayDragon,
                     $"{BribeLabel}Pay the dragon's toll.",
-                    condition: new HasMinimumResourceCondition(ResourceType.Gold, 100),
-                    action: new ModifyResourceAction(ResourceType.Gold, -100))
+                    condition: new HasMinimumResourceCondition<string>(ValueRegistry.Gold, 100),
+                    action: new ModifyResourceAction<string>(ValueRegistry.Gold, -100))
                 .WithChoice(
                     SceneId.RunFromDragon,
                     $"{FleeLabel}This is madness! Run away!")
@@ -174,15 +173,15 @@ public static class AdventureProvider
                 .WithChoice(
                     SceneId.TakeChalice,
                     "Take the golden chalice.",
-                    action: new ModifyResourceAction(ResourceType.Gold, 100))
+                    action: new ModifyResourceAction<string>(ValueRegistry.Gold, 100))
                 .WithChoice(
                     SceneId.TakePotion,
                     "Take the health potion.",
-                    action: new ModifyResourceAction(ResourceType.Health, 50))
+                    action: new ModifyResourceAction<string>(ValueRegistry.Health, 50))
                 .WithChoice(
                     SceneId.TakeCrystal,
                     "Take the mana crystal",
-                    action: new ModifyResourceAction(ResourceType.Mana, 50))
+                    action: new ModifyResourceAction<string>(ValueRegistry.Mana, 50))
                 .EndNode()
 
             .AddLinearNode(
@@ -206,6 +205,6 @@ public static class AdventureProvider
                 SceneId.Victory,
                 "You left the cavern alive.")
 
-            .Build(state, startingSceneId);
+            .BuildRunner(ValueRegistry.Registry, startingSceneId);
     }
 }

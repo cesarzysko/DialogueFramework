@@ -31,17 +31,15 @@ public class TextAdventureTests
     [InlineData(new[] { 0, 0, 0, 0, 0, 1, 0, 0, 2, 1, 0, 0, 0, 0 }, true)]
     public void TextAdventure_TakePath_CanComplete(int[] choices, bool expectedResult)
     {
-        var playerState = new PlayerState(100, 100, 100);
-        this.testOutputHelper.WriteLine(playerState.GetPlayerStateMessage());
         this.testOutputHelper.WriteLine("\n////////////////////////////////////////");
 
-        var adventure = AdventureProvider.BuildAdventure(playerState, logger: new ConsoleLogger(this.testOutputHelper));
+        var adventure = AdventureProvider.BuildAdventure(logger: new ConsoleLogger(this.testOutputHelper));
 
         int i = -1;
         int n = choices.Length;
         while (++i < n)
         {
-            this.testOutputHelper.WriteLine(adventure.Current.Content);
+            this.testOutputHelper.WriteLine(adventure.Current?.Content);
 
             var allChoices = adventure.GetChoices();
             var availableChoices = adventure.GetAvailableChoices();
@@ -74,8 +72,6 @@ public class TextAdventureTests
             }
         }
 
-        this.testOutputHelper.WriteLine(playerState.GetPlayerStateMessage());
-
-        Assert.Equal(expectedResult, adventure.IsCompleted());
+        Assert.Equal(expectedResult, adventure.ReachedTerminalNode());
     }
 }

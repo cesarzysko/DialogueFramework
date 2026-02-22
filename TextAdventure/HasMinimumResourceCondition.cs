@@ -7,36 +7,32 @@ namespace DialogueFramework.Tests.XUnit;
 /// <summary>
 /// Condition that checks if the player has minimum required resources.
 /// </summary>
-public class HasMinimumResourceCondition : ICondition
+/// <typeparam name="TRegistryKey">The type key used to identify values in the registry.</typeparam>
+public class HasMinimumResourceCondition<TRegistryKey> : ICondition<TRegistryKey>
+    where TRegistryKey : notnull
 {
-    private readonly ResourceType resourceType;
+    private readonly ValueHandle<int> resourceHandle;
     private readonly int minimumAmount;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="HasMinimumResourceCondition"/> class.
+    /// Initializes a new instance of the <see cref="HasMinimumResourceCondition{TRegistryKey}"/> class.
     /// </summary>
-    /// <param name="resourceType">The type of resource checked.</param>
+    /// <param name="resourceHandle">The type of resource checked.</param>
     /// <param name="minimumAmount">The minimum amount of the resource the player needs to have.</param>
-    public HasMinimumResourceCondition(ResourceType resourceType, int minimumAmount)
+    public HasMinimumResourceCondition(ValueHandle<int> resourceHandle, int minimumAmount)
     {
-        this.resourceType = resourceType;
+        this.resourceHandle = resourceHandle;
         this.minimumAmount = minimumAmount;
     }
 
     /// <inheritdoc/>
-    public bool Evaluate(IVariableStore? variables)
+    public bool Evaluate(IValueRegistry<TRegistryKey>? valueRegistry)
     {
-        if (variables == null)
+        if (valueRegistry == null)
         {
             return false;
         }
 
-        return this.resourceType switch
-        {
-            ResourceType.Health => variables.TryGet(ResourceType.Health, out int health) && health >= this.minimumAmount,
-            ResourceType.Mana => variables.TryGet(ResourceType.Mana, out int mana) && mana >= this.minimumAmount,
-            ResourceType.Gold => variables.TryGet(ResourceType.Gold, out int gold) && gold >= this.minimumAmount,
-            _ => false,
-        };
+        return valueRegistry.Get(this.resourceHandle) >= this.minimumAmount;
     }
 }

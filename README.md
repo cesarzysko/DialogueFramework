@@ -34,8 +34,8 @@ This project is built as a programming skill–polishing exercise, focusing on c
 
 ### Roadmap
 
-- Dialogue framework core - **Done**
-- Dialogue graph serialization support - **In Progress**
+- Dialogue framework core - **In Progress**
+- Dialogue graph serialization support
 - Save / Load runtime state
 - Dialogue editing
 - Unity adapter layer

@@ -5,13 +5,21 @@
 namespace DialogueFramework;
 
 /// <summary>
-/// An interface to define certain actions to be performed upon selecting a dialogue choice.
+/// Encapsulates an effect to be carried out when a dialogue choice is selected.
 /// </summary>
-public interface IAction
+/// <typeparam name="TRegistryKey">
+/// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
+/// </typeparam>
+public interface IAction<out TRegistryKey>
+    where TRegistryKey : notnull
 {
+    // TODO: Implement IReadWriteValueRegistry for action execution.
+
     /// <summary>
-    /// Executes actions tied to a dialogue choice selection.
+    /// Carries out the effect associated with this action.
     /// </summary>
-    /// <param name="variables">The variables source used to perform the action execution.</param>
-    void Execute(IVariableStore? variables);
+    /// <param name="valueRegistry">
+    /// The registry to read from or write to.
+    /// </param>
+    void Execute(IValueRegistry<TRegistryKey>? valueRegistry);
 }

@@ -7,15 +7,19 @@ namespace DialogueFramework;
 using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
-/// Defines a common type for registering user-front ids as internal ids.
+/// Maps user-defined node identifiers of type <typeparamref name="TUserId"/> to sequentially assigned internal
+/// <see cref="NodeId"/> values, and supports reverse lookup.
 /// </summary>
-/// <param name="logger">An optional logger to write internal messages to.</param>
-/// <typeparam name="TUserId">The type of the user-front id.</typeparam>
+/// <typeparam name="TUserId">
+/// The user-defined type used to name dialogue nodes.
+/// </typeparam>
+/// <param name="logger">
+/// An optional logger that receives debug messages.
+/// </param>
 internal sealed class NodeIdRegistry<TUserId>(
     ILogger? logger = null)
         where TUserId : notnull
 {
-    private readonly object lockObj = new();
     private int nextId;
 
     private Dictionary<TUserId, NodeId> UserToInternal { get; } = new();
@@ -25,11 +29,17 @@ internal sealed class NodeIdRegistry<TUserId>(
     private ILogger? Logger { get; } = logger;
 
     /// <summary>
-    /// Returns the internal id associated with the given user-front id.
+    /// Returns the internal <see cref="NodeId"/> assigned to <paramref name="userId"/>.
     /// </summary>
-    /// <param name="userId">The user-front id associated with the internal id to be returned.</param>
-    /// <returns>The internal id associated with the given user-front id.</returns>
-    /// <exception cref="ArgumentException">When the user-front id does not correspond to any internal id.</exception>
+    /// <param name="userId">
+    /// The user-defined identifier to look up.
+    /// </param>
+    /// <returns>
+    /// The corresponding <see cref="NodeId"/>.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="userId"/> has not been registered.
+    /// </exception>
     public NodeId GetInternalId(TUserId userId)
     {
         if (this.UserToInternal.TryGetValue(userId, out NodeId internalId))
@@ -43,22 +53,35 @@ internal sealed class NodeIdRegistry<TUserId>(
     }
 
     /// <summary>
-    /// Returns the internal id if it is associated with the given user-front id.
+    /// Attempts to retrieve the internal <see cref="NodeId"/> assigned to <paramref name="userId"/> without throwing
+    /// if it is not found.
     /// </summary>
-    /// <param name="userId">The user-front id associated with the internal id to be returned.</param>
-    /// <param name="internalId">The returned internal id associated with the given user-front id.</param>
-    /// <returns>Whether the internal id was successfully retrieved from the registry.</returns>
+    /// <param name="userId">
+    /// The user-defined identifier to look up.
+    /// </param>
+    /// <param name="internalId">
+    /// The corresponding <see cref="NodeId"/>.
+    /// </param>
+    /// <returns>
+    /// true if <paramref name="userId"/> is registered; otherwise false.
+    /// </returns>
     public bool TryGetInternalId(TUserId userId, out NodeId internalId)
     {
         return this.UserToInternal.TryGetValue(userId, out internalId);
     }
 
     /// <summary>
-    /// Return the user-front id associated with the given internal id.
+    /// Returns the user-defined identifier associated with the given internal <see cref="NodeId"/>.
     /// </summary>
-    /// <param name="internalId">The internal id associated with the user-front id to be returned.</param>
-    /// <returns>The user-front id associated with the given internal id.</returns>
-    /// <exception cref="ArgumentException">When the internal id does not correspond to any user-front id.</exception>
+    /// <param name="internalId">
+    /// The internal identifier to look up.
+    /// </param>
+    /// <returns>
+    /// The corresponding user-defined identifier.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="internalId"/> does not correspond to any registered identifier.
+    /// </exception>
     public TUserId GetUserId(NodeId internalId)
     {
         if (this.InternalToUser.TryGetValue(internalId.Value, out TUserId? userId))
@@ -72,64 +95,79 @@ internal sealed class NodeIdRegistry<TUserId>(
     }
 
     /// <summary>
-    /// Returns the user-front id if it is associated with the given internal id.
+    /// Attempts to retrieve the caller-defined identifier associated with the given internal <see cref="NodeId"/>
+    /// without throwing if it is not found.
     /// </summary>
-    /// <param name="internalId">The internal id associated with the user-front id to be returned.</param>
-    /// <param name="userId">The user-front id associated with the given internal id.</param>
-    /// <returns>Whether the user-front id was successfully retrieved from the registry.</returns>
+    /// <param name="internalId">
+    /// The internal identifier to look up.
+    /// </param>
+    /// <param name="userId">
+    /// The corresponding user-defined identifier.
+    /// </param>
+    /// <returns>
+    /// true if <paramref name="internalId"/> is registered; otherwise false.
+    /// </returns>
     public bool TryGetUserId(NodeId internalId, [NotNullWhen(true)] out TUserId? userId)
     {
         return this.InternalToUser.TryGetValue(internalId.Value, out userId);
     }
 
     /// <summary>
-    /// Registers the user-front id as an internal id and returns it.
+    /// Registers <paramref name="userId"/> and assigns it a new internal <see cref="NodeId"/>.
     /// </summary>
-    /// <param name="userId">The user-front id to register.</param>
-    /// <returns>The newly created internal id corresponding to the registered user-front id.</returns>
-    /// <exception cref="ArgumentException">If the user id is already registered.</exception>
+    /// <param name="userId">
+    /// The user-defined identifier to register. Must not already be registered.
+    /// </param>
+    /// <returns>
+    /// The newly assigned <see cref="NodeId"/>.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="userId"/> has already been registered in this instance.
+    /// </exception>
     public NodeId Register(TUserId userId)
     {
-        lock (this.lockObj)
+        if (!this.UserToInternal.ContainsKey(userId))
         {
-            if (!this.UserToInternal.ContainsKey(userId))
-            {
-                return this.RegisterInternal(userId);
-            }
-
-            string msg = $"User ID \"{userId}\" is already registered.";
-            this.Logger?.LogError(msg);
-            throw new ArgumentException(msg, nameof(userId));
+            return this.RegisterInternal(userId);
         }
+
+        string msg = $"User ID \"{userId}\" is already registered.";
+        this.Logger?.LogError(msg);
+        throw new ArgumentException(msg, nameof(userId));
     }
 
     /// <summary>
-    /// Registers the user-front id as an internal id and returns it, or an existing one if already registered.
+    /// Returns the existing internal <see cref="NodeId"/> for <paramref name="userId"/> if it has already been
+    /// registered, or registers it and returns a new one.
     /// </summary>
-    /// <param name="userId">The user-front id to register.</param>
-    /// <returns>The newly created or existing internal id corresponding to the registered user-front id.</returns>
+    /// <param name="userId">
+    /// The user-defined identifier to look up or register.
+    /// </param>
+    /// <returns>
+    /// The existing or newly assigned <see cref="NodeId"/> for <paramref name="userId"/>.
+    /// </returns>
     public NodeId GetOrRegister(TUserId userId)
     {
         if (this.UserToInternal.TryGetValue(userId, out var existing))
         {
-            this.Logger?.LogDebug($"Returning existing registration \"{existing.Value}\" for \"{userId}\".");
+            this.Logger?.LogDebug($"Returning existing registration \"{existing.Value}\" for \"{userId}\" (registered by another thread).");
             return existing;
         }
 
-        lock (this.lockObj)
-        {
-            if (this.UserToInternal.TryGetValue(userId, out existing))
-            {
-                this.Logger?.LogDebug($"Returning existing registration \"{existing.Value}\" for \"{userId}\" (registered by another thread).");
-                return existing;
-            }
-
-            var newId = this.RegisterInternal(userId);
-            this.Logger?.LogDebug($"Registered new user ID \"{userId}\" as \"{newId.Value}\".");
-            return newId;
-        }
+        var newId = this.RegisterInternal(userId);
+        this.Logger?.LogDebug($"Registered new user ID \"{userId}\" as \"{newId.Value}\".");
+        return newId;
     }
 
+    /// <summary>
+    /// Creates and records the bidirectional mapping for <paramref name="userId"/>.
+    /// </summary>
+    /// <param name="userId">
+    /// The identifier to register.
+    /// </param>
+    /// <returns>
+    /// The newly assigned <see cref="NodeId"/>.
+    /// </returns>
     private NodeId RegisterInternal(TUserId userId)
     {
         var internalId = new NodeId(this.nextId++);

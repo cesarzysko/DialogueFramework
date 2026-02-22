@@ -5,27 +5,33 @@
 namespace DialogueFramework;
 
 /// <summary>
-/// Action that executes multiple actions in a sequence.
+/// An <see cref="IAction{TRegistryKey}"/> that executes a fixed sequence of other actions in order.
 /// </summary>
-public class CompositeAction : IAction
+/// <typeparam name="TRegistryKey">
+/// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
+/// </typeparam>
+public class CompositeAction<TRegistryKey> : IAction<TRegistryKey>
+    where TRegistryKey : notnull
 {
-    private readonly IAction[] actions;
+    private readonly IAction<TRegistryKey>[] actions;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CompositeAction"/> class.
+    /// Initializes a new instance of the <see cref="CompositeAction{TRegistryKey}"/> class.
     /// </summary>
-    /// <param name="actions">The actions to execute.</param>
-    public CompositeAction(params IAction[] actions)
+    /// <param name="actions">
+    /// The actions to execute in order when this composite action is triggered.
+    /// </param>
+    public CompositeAction(params IAction<TRegistryKey>[] actions)
     {
         this.actions = actions;
     }
 
     /// <inheritdoc/>
-    public void Execute(IVariableStore? variables)
+    public void Execute(IValueRegistry<TRegistryKey>? valueRegistry)
     {
         foreach (var action in this.actions)
         {
-            action.Execute(variables);
+            action.Execute(valueRegistry);
         }
     }
 }

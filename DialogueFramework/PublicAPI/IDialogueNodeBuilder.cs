@@ -5,79 +5,139 @@
 namespace DialogueFramework;
 
 /// <summary>
-/// An interface used to create dialogues.
+/// A builder for constructing a dialogue graph node by node, culminating in an
+/// <see cref="IDialogueRunner{TRegistryKey,TDialogueContent,TChoiceContent}"/> that traverses the finished graph.
 /// </summary>
-/// <typeparam name="TUserId">The user-front type used for dialogues identification.</typeparam>
-/// <typeparam name="TDialogueContent">The displayable content of dialogues.</typeparam>
-/// <typeparam name="TChoiceContent">The displayable content of dialogue choices.</typeparam>
-public interface IDialogueNodeBuilder<TUserId, TDialogueContent, TChoiceContent>
+/// <typeparam name="TRegistryKey">
+/// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
+/// </typeparam>
+/// <typeparam name="TUserId">
+/// The user-defined type used to name and reference dialogue nodes.
+/// </typeparam>
+/// <typeparam name="TDialogueContent">
+/// The type of displayable data carried by each dialogue node.
+/// </typeparam>
+/// <typeparam name="TChoiceContent">
+/// The type of displayable data carried by each choice.
+/// </typeparam>
+public interface IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent>
     where TUserId : notnull
+    where TRegistryKey : notnull
 {
     /// <summary>
-    /// Creates a dialogue node and allows to specify each dialogue choice.
+    /// Begins defining a branching node with multiple selectable choices.
     /// </summary>
-    /// <param name="userId">The user-front dialogue identifier.</param>
-    /// <param name="dialogueContent">The displayable content of the created dialogue node.</param>
-    /// <returns>A builder used to define dialogue node choices.</returns>
-    public IDialogueNodeChoiceBuilder<TUserId, TDialogueContent, TChoiceContent> AddMultiChoiceNode(
+    /// <param name="userId">
+    /// A unique user-defined identifier for this node.
+    /// </param>
+    /// <param name="dialogueContent">
+    /// The data to display when the runner arrives at this node.
+    /// </param>
+    /// <returns>
+    /// A <see cref="IDialogueNodeChoiceBuilder{TRegistryKey,TUserId,TDialogueContent,TChoiceContent}"/> for adding
+    /// choices to this node.
+    /// </returns>
+    public IDialogueNodeChoiceBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> AddMultiChoiceNode(
         TUserId userId,
         TDialogueContent dialogueContent);
 
     /// <summary>
     /// Creates a dialogue node with a single choice leading to another dialogue node.
     /// </summary>
-    /// <param name="userId">The user-front identification of the dialogue node.</param>
-    /// <param name="dialogueContent">The displayable content of the dialogue node.</param>
-    /// <param name="targetUserId">The user-front identification of the dialogue node following this dialogue node.</param>
-    /// <param name="choiceContent">The optional displayable content of the dialogue choice.</param>
-    /// <param name="action">The optional action triggered once selecting the dialogue choice.</param>
-    /// <returns>Self.</returns>
-    public IDialogueNodeBuilder<TUserId, TDialogueContent, TChoiceContent> AddLinearNode(
+    /// <param name="userId">
+    /// A unique user-defined identifier for this node.
+    /// </param>
+    /// <param name="dialogueContent">
+    /// The data to display when the runner arrives at this node.
+    /// </param>
+    /// <param name="targetUserId">
+    /// The identifier of the node to advance to when the choice is selected.
+    /// </param>
+    /// <param name="choiceContent">
+    /// Optional data to display for the single choice.
+    /// </param>
+    /// <param name="action">
+    /// An optional effect to execute when the choice is selected.
+    /// </param>
+    /// <returns>
+    /// This builder instance, enabling method chaining.
+    /// </returns>
+    public IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> AddLinearNode(
         TUserId userId,
         TDialogueContent dialogueContent,
         TUserId targetUserId,
         TChoiceContent? choiceContent = default,
-        IAction? action = null);
+        IAction<TRegistryKey>? action = null);
 
     /// <summary>
-    /// Creates a dialogue node with a single choice leading to the dialogue end.
+    /// Adds a node with a single choice that ends the dialogue rather than advancing to another node.
     /// </summary>
-    /// <param name="userId">The user-front identification of the dialogue node.</param>
-    /// <param name="dialogueContent">The displayable content of the dialogue node.</param>
-    /// <param name="choiceContent">The optional displayable content of the dialogue choice.</param>
-    /// <param name="action">The optional action triggered once selecting the dialogue choice.</param>
-    /// <returns>Self.</returns>
-    public IDialogueNodeBuilder<TUserId, TDialogueContent, TChoiceContent> AddTerminalNode(
+    /// <param name="userId">
+    /// A unique user-defined identifier for this node.
+    /// </param>
+    /// <param name="dialogueContent">
+    /// The data to display when the runner arrives at this node.
+    /// </param>
+    /// <param name="choiceContent">
+    /// Optional data to display for the terminal choice.
+    /// </param>
+    /// <param name="action">
+    /// An optional effect to execute when the choice is selected.
+    /// </param>
+    /// <returns>
+    /// This builder instance, enabling method chaining.
+    /// </returns>
+    public IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> AddTerminalNode(
         TUserId userId,
         TDialogueContent dialogueContent,
         TChoiceContent? choiceContent = default,
-        IAction? action = null);
+        IAction<TRegistryKey>? action = null);
 
     /// <summary>
-    /// Creates a dialogue runner using previously created dialogue nodes.
+    /// Constructs the dialogue graph from all previously added nodes and returns a runner positioned at the specified
+    /// start node, ready for traversal.
     /// </summary>
-    /// <param name="variableStore">The source of values used in choice conditions and actions.</param>
-    /// <param name="startNode">The user-front dialogue node identifier, from which the dialogue should start running.</param>
-    /// <returns>The created dialogue runner.</returns>
-    public IDialogueRunner<TDialogueContent, TChoiceContent> Build(
-        IVariableStore? variableStore,
+    /// <param name="valueRegistry">
+    /// The registry made available to <see cref="ICondition{TRegistryKey}"/> and <see cref="IAction{TRegistryKey}"/>
+    /// implementations at runtime.
+    /// </param>
+    /// <param name="startNode">
+    /// The USER-defined identifier of the node at which the runner should begin.
+    /// </param>
+    /// <returns>
+    /// An <see cref="IDialogueRunner{TRegistryKey,TDialogueContent,TChoiceContent}"/> ready to traverse the
+    /// constructed graph.
+    /// </returns>
+    public IDialogueRunner<TRegistryKey, TDialogueContent, TChoiceContent> BuildRunner(
+        IValueRegistry<TRegistryKey>? valueRegistry,
         TUserId startNode);
 
     /// <summary>
-    /// Returns the internal id of the dialogue node corresponding to the given user-front identifier.
+    /// Returns the internal <see cref="NodeId"/> assigned to the given user-defined identifier, registering a new one
+    /// if the identifier has not been seen before.
     /// </summary>
-    /// <param name="userId">The user-front identifier corresponding to the returned internal id.</param>
-    /// <returns>The internal id.</returns>
+    /// <param name="userId">
+    /// The user-defined identifier to look up or register.
+    /// </param>
+    /// <returns>
+    /// The corresponding internal <see cref="NodeId"/>.
+    /// </returns>
     internal NodeId GetInternalId(TUserId userId);
 
     /// <summary>
-    /// Adds the node to the nodes list once all choices are decided.
+    /// Registers a fully constructed node into the builder's node list.
     /// </summary>
-    /// <param name="userId">The user-front identifier of the dialogue node.</param>
-    /// <param name="dialogueContent">The displayable content of the dialogue node.</param>
-    /// <param name="choices">The choices of the dialogue node.</param>
+    /// <param name="userId">
+    /// The user-defined identifier of the node being added.
+    /// </param>
+    /// <param name="dialogueContent">
+    /// The displayable content of the node.
+    /// </param>
+    /// <param name="choices">
+    /// The ordered list of choices attached to the node.
+    /// </param>
     internal void AddDialogueNodeInternal(
         TUserId userId,
         TDialogueContent dialogueContent,
-        IReadOnlyList<DialogueChoice<TChoiceContent>> choices);
+        IReadOnlyList<DialogueChoice<TRegistryKey, TChoiceContent>> choices);
 }
