@@ -67,7 +67,7 @@ public interface IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, T
         TDialogueContent dialogueContent,
         TUserId targetUserId,
         TChoiceContent? choiceContent = default,
-        IAction<TRegistryKey>? action = null);
+        IAction? action = null);
 
     /// <summary>
     /// Adds a node with a single choice that ends the dialogue rather than advancing to another node.
@@ -91,7 +91,7 @@ public interface IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, T
         TUserId userId,
         TDialogueContent dialogueContent,
         TChoiceContent? choiceContent = default,
-        IAction<TRegistryKey>? action = null);
+        IAction? action = null);
 
     /// <summary>
     /// Constructs the dialogue graph from all previously added nodes and returns a runner positioned at the specified
@@ -108,7 +108,7 @@ public interface IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, T
     /// An <see cref="IDialogueRunner{TRegistryKey,TDialogueContent,TChoiceContent}"/> ready to traverse the
     /// constructed graph.
     /// </returns>
-    public IDialogueRunner<TRegistryKey, TDialogueContent, TChoiceContent> BuildRunner(
+    public IDialogueRunner<TDialogueContent, TChoiceContent> BuildRunner(
         IValueRegistry<TRegistryKey>? valueRegistry,
         TUserId startNode);
 
@@ -139,5 +139,5 @@ public interface IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, T
     internal void AddDialogueNodeInternal(
         TUserId userId,
         TDialogueContent dialogueContent,
-        IReadOnlyList<DialogueChoice<TRegistryKey, TChoiceContent>> choices);
+        IReadOnlyList<DialogueChoice<TChoiceContent>> choices);
 }

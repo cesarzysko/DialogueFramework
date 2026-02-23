@@ -8,22 +8,18 @@ namespace DialogueFramework;
 /// Controls the traversal of a dialogue graph, exposing the current node and advancing state in response to user
 /// choices.
 /// </summary>
-/// <typeparam name="TRegistryKey">
-/// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
-/// </typeparam>
 /// <typeparam name="TDialogueContent">
 /// The type of displayable data carried by each dialogue node.
 /// </typeparam>
 /// <typeparam name="TChoiceContent">
 /// The type of displayable data carried by each dialogue choice.
 /// </typeparam>
-public interface IDialogueRunner<TRegistryKey, out TDialogueContent, TChoiceContent>
-    where TRegistryKey : notnull
+public interface IDialogueRunner<out TDialogueContent, TChoiceContent>
 {
     /// <summary>
     /// Gets the node the runner is currently positioned on.
     /// </summary>
-    public IDialogueNode<TRegistryKey, TDialogueContent, TChoiceContent>? Current { get; }
+    public IDialogueNode<TDialogueContent, TChoiceContent>? Current { get; }
 
     /// <summary>
     /// Returns the choices of the current node that satisfy their associated conditions, and are therefore eligible
@@ -32,7 +28,7 @@ public interface IDialogueRunner<TRegistryKey, out TDialogueContent, TChoiceCont
     /// <returns>
     /// A snapshot of the choices currently available.
     /// </returns>
-    public IReadOnlyList<IDialogueChoice<TRegistryKey, TChoiceContent>> GetAvailableChoices();
+    public IReadOnlyList<IDialogueChoice<TChoiceContent>> GetAvailableChoices();
 
     /// <summary>
     /// Returns all choices of the current node, regardless of whether their conditions are satisfied.
@@ -40,7 +36,7 @@ public interface IDialogueRunner<TRegistryKey, out TDialogueContent, TChoiceCont
     /// <returns>
     /// A snapshot of every choice defined on the current node, regardless of whether their conditions are satisfied.
     /// </returns>
-    public IReadOnlyList<IDialogueChoice<TRegistryKey, TChoiceContent>> GetChoices();
+    public IReadOnlyList<IDialogueChoice<TChoiceContent>> GetChoices();
 
     /// <summary>
     /// Executes the action associated with <paramref name="choice"/> and, if the choice leads to another
@@ -62,7 +58,7 @@ public interface IDialogueRunner<TRegistryKey, out TDialogueContent, TChoiceCont
     /// <exception cref="InvalidOperationException">
     /// Thrown when the choice's target node is not found in the dialogue graph.
     /// </exception>
-    public bool Choose(IDialogueChoice<TRegistryKey, TChoiceContent> choice);
+    public bool Choose(IDialogueChoice<TChoiceContent> choice);
 
     /// <summary>
     /// Returns whether the dialogue has reached a terminal choice and can no longer advance.

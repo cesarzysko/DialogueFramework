@@ -15,7 +15,7 @@ public class DialogueBranchingTests
     [Fact]
     public void Dialogue_BranchIntoB_Correctly()
     {
-        IDialogueRunner<string, string, string> runner = GetDialogueRunner();
+        IDialogueRunner<string, string> runner = GetDialogueRunner();
 
         Assert.Equal("Welcome, traveler.", runner.Current?.Content);
 
@@ -49,7 +49,7 @@ public class DialogueBranchingTests
     [Fact]
     public void Dialogue_BranchIntoC_Correctly()
     {
-        IDialogueRunner<string, string, string> runner = GetDialogueRunner();
+        IDialogueRunner<string, string> runner = GetDialogueRunner();
 
         Assert.Equal("Welcome, traveler.", runner.Current?.Content);
 
@@ -77,7 +77,7 @@ public class DialogueBranchingTests
         Assert.False(endChooseSuccess);
     }
 
-    private static IDialogueRunner<string, string, string> GetDialogueRunner()
+    private static IDialogueRunner<string, string> GetDialogueRunner()
     {
         return DialogueBuilderFactory.CreateBuilder<string, string, string, string>()
             .AddLinearNode(StringIds.MsgA1, "Welcome, traveler.", StringIds.MsgA2, "Continue")

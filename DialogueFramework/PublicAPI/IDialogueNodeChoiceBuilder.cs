@@ -44,8 +44,8 @@ public interface IDialogueNodeChoiceBuilder<TRegistryKey, TUserId, TDialogueCont
     public IDialogueNodeChoiceBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> WithChoice(
         TUserId targetUserId,
         TChoiceContent choiceContent,
-        ICondition<TRegistryKey>? condition = null,
-        IAction<TRegistryKey>? action = null);
+        ICondition? condition = null,
+        IAction? action = null);
 
     /// <summary>
     /// Adds a terminal choice that, when selected, ends the dialogue rather than advancing to another node.
@@ -64,8 +64,8 @@ public interface IDialogueNodeChoiceBuilder<TRegistryKey, TUserId, TDialogueCont
     /// </returns>
     public IDialogueNodeChoiceBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> WithEndChoice(
         TChoiceContent? choiceContent,
-        ICondition<TRegistryKey>? condition = null,
-        IAction<TRegistryKey>? action = null);
+        ICondition? condition = null,
+        IAction? action = null);
 
     /// <summary>
     /// Finalizes the current node with the choices added so far and returns the parent builder to continue defining

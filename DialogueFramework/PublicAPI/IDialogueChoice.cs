@@ -7,14 +7,10 @@ namespace DialogueFramework;
 /// <summary>
 /// Represents a single selectable choice within a dialogue node.
 /// </summary>
-/// <typeparam name="TRegistryKey">
-/// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
-/// </typeparam>
 /// <typeparam name="TContent">
 /// The type of displayable data attached to the choice.
 /// </typeparam>
-public interface IDialogueChoice<out TRegistryKey, out TContent>
-    where TRegistryKey : notnull
+public interface IDialogueChoice<out TContent>
 {
     /// <summary>
     /// Gets the data to display when presenting this choice to the user.
@@ -29,10 +25,10 @@ public interface IDialogueChoice<out TRegistryKey, out TContent>
     /// <summary>
     /// Gets the condition that must be satisfied for this choice to appear as available.
     /// </summary>
-    internal ICondition<TRegistryKey>? Condition { get; }
+    internal ICondition? Condition { get; }
 
     /// <summary>
     /// Gets the action executed by the runner when this choice is selected.
     /// </summary>
-    internal IAction<TRegistryKey>? Action { get; }
+    internal IAction? Action { get; }
 }

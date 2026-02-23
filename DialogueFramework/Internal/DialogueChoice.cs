@@ -7,18 +7,14 @@ namespace DialogueFramework;
 /// <summary>
 /// An immutable, internal implementation of <see cref="IDialogueChoice{TRegistryKey,TContent}"/>.
 /// </summary>
-/// <typeparam name="TRegistryKey">
-/// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
-/// </typeparam>
 /// <typeparam name="TContent">
 /// The type of displayable data carried by this choice.
 /// </typeparam>
-internal sealed class DialogueChoice<TRegistryKey, TContent>
-    : IDialogueChoice<TRegistryKey, TContent>
-    where TRegistryKey : notnull
+internal sealed class DialogueChoice<TContent>
+    : IDialogueChoice<TContent>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="DialogueChoice{TRegistryKey, TContent}"/> class.
+    /// Initializes a new instance of the <see cref="DialogueChoice{TContent}"/> class.
     /// </summary>
     /// <param name="content">
     /// The data to display when presenting this choice to the user.
@@ -35,8 +31,8 @@ internal sealed class DialogueChoice<TRegistryKey, TContent>
     internal DialogueChoice(
         TContent? content,
         NodeId? target = null,
-        ICondition<TRegistryKey>? condition = null,
-        IAction<TRegistryKey>? action = null)
+        ICondition? condition = null,
+        IAction? action = null)
     {
         this.Content = content;
         this.Target = target;
@@ -51,8 +47,8 @@ internal sealed class DialogueChoice<TRegistryKey, TContent>
     public NodeId? Target { get; }
 
     /// <inheritdoc/>
-    public ICondition<TRegistryKey>? Condition { get; }
+    public ICondition? Condition { get; }
 
     /// <inheritdoc/>
-    public IAction<TRegistryKey>? Action { get; }
+    public IAction? Action { get; }
 }

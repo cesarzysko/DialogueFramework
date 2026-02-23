@@ -7,21 +7,17 @@ namespace DialogueFramework;
 /// <summary>
 /// An immutable, internal implementation of <see cref="IDialogueNode{TRegistryKey,TDialogueContent,TChoiceContent}"/>.
 /// </summary>
-/// <typeparam name="TRegistryKey">
-/// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
-/// </typeparam>
 /// <typeparam name="TDialogueContent">
 /// The type of displayable data attached to this node.
 /// </typeparam>
 /// <typeparam name="TChoiceContent">
 /// The type of displayable data attached to each choice in this node.
 /// </typeparam>
-internal sealed class DialogueNode<TRegistryKey, TDialogueContent, TChoiceContent>
-    : IDialogueNode<TRegistryKey, TDialogueContent, TChoiceContent>
-    where TRegistryKey : notnull
+internal sealed class DialogueNode<TDialogueContent, TChoiceContent>
+    : IDialogueNode<TDialogueContent, TChoiceContent>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="DialogueNode{TRegistryKey, TDialogueContent, TChoiceContent}"/> class.
+    /// Initializes a new instance of the <see cref="DialogueNode{TDialogueContent, TChoiceContent}"/> class.
     /// </summary>
     /// <param name="id">
     /// The internal identifier assigned to this node by <see cref="NodeIdRegistry{TUserId}"/>.
@@ -35,7 +31,7 @@ internal sealed class DialogueNode<TRegistryKey, TDialogueContent, TChoiceConten
     internal DialogueNode(
         NodeId id,
         TDialogueContent content,
-        IReadOnlyList<DialogueChoice<TRegistryKey, TChoiceContent>> choices)
+        IReadOnlyList<DialogueChoice<TChoiceContent>> choices)
     {
         this.Id = id;
         this.Content = content;
@@ -51,5 +47,5 @@ internal sealed class DialogueNode<TRegistryKey, TDialogueContent, TChoiceConten
     public TDialogueContent Content { get; }
 
     /// <inheritdoc/>
-    public IReadOnlyList<IDialogueChoice<TRegistryKey, TChoiceContent>> Choices { get; }
+    public IReadOnlyList<IDialogueChoice<TChoiceContent>> Choices { get; }
 }

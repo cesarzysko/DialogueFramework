@@ -5,8 +5,8 @@
 namespace DialogueFramework;
 
 /// <summary>
-/// The default implementation of <see cref="IDialogueRunner{TRegistryKey,TDialogueContent,TChoiceContent}"/> that
-/// traverses a <see cref="DialogueGraph{TRegistryKey,TDialogueContent,TChoiceContent}"/> in response to player choices.
+/// The default implementation of <see cref="IDialogueRunner{TDialogueContent,TChoiceContent}"/> that
+/// traverses a <see cref="DialogueGraph{TDialogueContent,TChoiceContent}"/> in response to player choices.
 /// </summary>
 /// <typeparam name="TRegistryKey">
 /// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
@@ -18,10 +18,10 @@ namespace DialogueFramework;
 /// The type of displayable data carried by each choice.
 /// </typeparam>
 internal sealed class DialogueRunner<TRegistryKey, TDialogueContent, TChoiceContent>
-    : IDialogueRunner<TRegistryKey, TDialogueContent, TChoiceContent>
+    : IDialogueRunner<TDialogueContent, TChoiceContent>
     where TRegistryKey : notnull
 {
-    private readonly DialogueGraph<TRegistryKey, TDialogueContent, TChoiceContent> graph;
+    private readonly DialogueGraph<TDialogueContent, TChoiceContent> graph;
     private readonly IValueRegistry<TRegistryKey>? valueRegistry;
     private readonly NodeId startNode;
     private bool reachedTerminalNode;
@@ -39,7 +39,7 @@ internal sealed class DialogueRunner<TRegistryKey, TDialogueContent, TChoiceCont
     /// The internal identifier of the node at which traversal should begin.
     /// </param>
     internal DialogueRunner(
-        DialogueGraph<TRegistryKey, TDialogueContent, TChoiceContent> graph,
+        DialogueGraph<TDialogueContent, TChoiceContent> graph,
         IValueRegistry<TRegistryKey>? valueRegistry,
         NodeId startNode)
     {
@@ -50,7 +50,7 @@ internal sealed class DialogueRunner<TRegistryKey, TDialogueContent, TChoiceCont
     }
 
     /// <inheritdoc/>
-    public IDialogueNode<TRegistryKey, TDialogueContent, TChoiceContent>? Current { get; private set; }
+    public IDialogueNode<TDialogueContent, TChoiceContent>? Current { get; private set; }
 
     /// <inheritdoc/>
     public void Reset()
@@ -60,7 +60,7 @@ internal sealed class DialogueRunner<TRegistryKey, TDialogueContent, TChoiceCont
     }
 
     /// <inheritdoc/>
-    public IReadOnlyList<IDialogueChoice<TRegistryKey, TChoiceContent>> GetAvailableChoices()
+    public IReadOnlyList<IDialogueChoice<TChoiceContent>> GetAvailableChoices()
     {
         if (this.Current == null)
         {
@@ -73,7 +73,7 @@ internal sealed class DialogueRunner<TRegistryKey, TDialogueContent, TChoiceCont
     }
 
     /// <inheritdoc/>
-    public IReadOnlyList<IDialogueChoice<TRegistryKey, TChoiceContent>> GetChoices()
+    public IReadOnlyList<IDialogueChoice<TChoiceContent>> GetChoices()
     {
         if (this.Current == null)
         {
@@ -84,7 +84,7 @@ internal sealed class DialogueRunner<TRegistryKey, TDialogueContent, TChoiceCont
     }
 
     /// <inheritdoc/>
-    public bool Choose(IDialogueChoice<TRegistryKey, TChoiceContent> choice)
+    public bool Choose(IDialogueChoice<TChoiceContent> choice)
     {
         ArgumentNullException.ThrowIfNull(choice);
         if (this.Current == null || !this.Current.Choices.Contains(choice))

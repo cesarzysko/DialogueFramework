@@ -7,15 +7,13 @@ namespace DialogueFramework.Tests.XUnit;
 /// <summary>
 /// Condition that checks if the player has minimum required resources.
 /// </summary>
-/// <typeparam name="TRegistryKey">The type key used to identify values in the registry.</typeparam>
-public class HasMinimumResourceCondition<TRegistryKey> : ICondition<TRegistryKey>
-    where TRegistryKey : notnull
+public class HasMinimumResourceCondition : ICondition
 {
     private readonly ValueHandle<int> resourceHandle;
     private readonly int minimumAmount;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="HasMinimumResourceCondition{TRegistryKey}"/> class.
+    /// Initializes a new instance of the <see cref="HasMinimumResourceCondition"/> class.
     /// </summary>
     /// <param name="resourceHandle">The type of resource checked.</param>
     /// <param name="minimumAmount">The minimum amount of the resource the player needs to have.</param>
@@ -26,7 +24,7 @@ public class HasMinimumResourceCondition<TRegistryKey> : ICondition<TRegistryKey
     }
 
     /// <inheritdoc/>
-    public bool Evaluate(IValueRegistry<TRegistryKey>? valueRegistry)
+    public bool Evaluate(IReadOnlyValueRegistry? valueRegistry)
     {
         if (valueRegistry == null)
         {

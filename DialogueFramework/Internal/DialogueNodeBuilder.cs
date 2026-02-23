@@ -26,7 +26,7 @@ internal sealed class DialogueNodeBuilder<TRegistryKey, TUserId, TDialogueConten
     where TUserId : notnull
     where TRegistryKey : notnull
 {
-    private readonly List<DialogueNode<TRegistryKey, TDialogueContent, TChoiceContent>> nodes = [];
+    private readonly List<DialogueNode<TDialogueContent, TChoiceContent>> nodes = [];
 
     private readonly NodeIdRegistry<TUserId> registry;
 
@@ -42,14 +42,14 @@ internal sealed class DialogueNodeBuilder<TRegistryKey, TUserId, TDialogueConten
     }
 
     /// <inheritdoc/>
-    public IDialogueRunner<TRegistryKey, TDialogueContent, TChoiceContent> BuildRunner(IValueRegistry<TRegistryKey>? valueRegistry, TUserId startNode)
+    public IDialogueRunner<TDialogueContent, TChoiceContent> BuildRunner(IValueRegistry<TRegistryKey>? valueRegistry, TUserId startNode)
     {
         if (this.nodes.Count == 0)
         {
             throw new InvalidOperationException("Cannot build dialogue with no nodes.");
         }
 
-        var graph = new DialogueGraph<TRegistryKey, TDialogueContent, TChoiceContent>(this.nodes);
+        var graph = new DialogueGraph<TDialogueContent, TChoiceContent>(this.nodes);
         return new DialogueRunner<TRegistryKey, TDialogueContent, TChoiceContent>(graph, valueRegistry, this.registry.GetInternalId(startNode));
     }
 
@@ -67,7 +67,7 @@ internal sealed class DialogueNodeBuilder<TRegistryKey, TUserId, TDialogueConten
         TDialogueContent dialogueContent,
         TUserId targetUserId,
         TChoiceContent? choiceContent = default,
-        IAction<TRegistryKey>? action = null)
+        IAction? action = null)
     {
         return this.AddMultiChoiceNode(userId, dialogueContent)
             .WithChoice(targetUserId, choiceContent!, null, action)
@@ -79,7 +79,7 @@ internal sealed class DialogueNodeBuilder<TRegistryKey, TUserId, TDialogueConten
         TUserId userId,
         TDialogueContent dialogueContent,
         TChoiceContent? choiceContent = default,
-        IAction<TRegistryKey>? action = null)
+        IAction? action = null)
     {
         return this.AddMultiChoiceNode(userId, dialogueContent)
             .WithEndChoice(choiceContent, null, action)
@@ -96,10 +96,10 @@ internal sealed class DialogueNodeBuilder<TRegistryKey, TUserId, TDialogueConten
     public void AddDialogueNodeInternal(
         TUserId userId,
         TDialogueContent dialogueContent,
-        IReadOnlyList<DialogueChoice<TRegistryKey, TChoiceContent>> choices)
+        IReadOnlyList<DialogueChoice<TChoiceContent>> choices)
     {
         NodeId id = this.registry.GetOrRegister(userId);
-        var dialogueNode = new DialogueNode<TRegistryKey, TDialogueContent, TChoiceContent>(id, dialogueContent, choices);
+        var dialogueNode = new DialogueNode<TDialogueContent, TChoiceContent>(id, dialogueContent, choices);
         this.nodes.Add(dialogueNode);
     }
 
@@ -113,7 +113,7 @@ internal sealed class DialogueNodeBuilder<TRegistryKey, TUserId, TDialogueConten
         private readonly IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> parent;
         private readonly TUserId userId;
         private readonly TDialogueContent dialogueContent;
-        private readonly List<DialogueChoice<TRegistryKey, TChoiceContent>> choices;
+        private readonly List<DialogueChoice<TChoiceContent>> choices;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DialogueNodeChoiceBuilder"/> class.
@@ -142,12 +142,12 @@ internal sealed class DialogueNodeBuilder<TRegistryKey, TUserId, TDialogueConten
         public IDialogueNodeChoiceBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> WithChoice(
             TUserId targetUserId,
             TChoiceContent choiceContent,
-            ICondition<TRegistryKey>? condition = null,
-            IAction<TRegistryKey>? action = null)
+            ICondition? condition = null,
+            IAction? action = null)
         {
             NodeId targetId = this.parent.GetInternalId(targetUserId);
 
-            var choice = new DialogueChoice<TRegistryKey, TChoiceContent>(choiceContent, targetId, condition, action);
+            var choice = new DialogueChoice<TChoiceContent>(choiceContent, targetId, condition, action);
             this.choices.Add(choice);
 
             return this;
@@ -156,10 +156,10 @@ internal sealed class DialogueNodeBuilder<TRegistryKey, TUserId, TDialogueConten
         /// <inheritdoc/>
         public IDialogueNodeChoiceBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> WithEndChoice(
             TChoiceContent? choiceContent,
-            ICondition<TRegistryKey>? condition = null,
-            IAction<TRegistryKey>? action = null)
+            ICondition? condition = null,
+            IAction? action = null)
         {
-            var choice = new DialogueChoice<TRegistryKey, TChoiceContent>(choiceContent, null, condition, action);
+            var choice = new DialogueChoice<TChoiceContent>(choiceContent, null, condition, action);
             this.choices.Add(choice);
 
             return this;
