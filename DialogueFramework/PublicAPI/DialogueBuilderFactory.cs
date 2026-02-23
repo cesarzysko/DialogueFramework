@@ -18,11 +18,11 @@ public static class DialogueBuilderFactory
     /// <typeparam name="TDialogueContent">The displayable content of dialogues.</typeparam>
     /// <typeparam name="TChoiceContent">The displayable content of dialogue choices.</typeparam>
     /// <returns>The created dialogue builder.</returns>
-    public static IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> CreateBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent>(
+    public static INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> CreateBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent>(
         ILogger? logger = null)
         where TUserId : notnull
         where TRegistryKey : notnull
     {
-        return new DialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent>(logger);
+        return new NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent>(logger);
     }
 }

@@ -1,11 +1,11 @@
-// <copyright file="DialogueNode.cs" company="SPS">
+// <copyright file="Node.cs" company="SPS">
 // Copyright (c) SPS. All rights reserved.
 // </copyright>
 
 namespace DialogueFramework;
 
 /// <summary>
-/// An immutable, internal implementation of <see cref="IDialogueNode{TDialogueContent,TChoiceContent}"/>.
+/// An immutable, internal implementation of <see cref="INode{TDialogueContent,TChoiceContent}"/>.
 /// </summary>
 /// <typeparam name="TDialogueContent">
 /// The type of displayable data attached to this node.
@@ -13,11 +13,11 @@ namespace DialogueFramework;
 /// <typeparam name="TChoiceContent">
 /// The type of displayable data attached to each choice in this node.
 /// </typeparam>
-internal sealed class DialogueNode<TDialogueContent, TChoiceContent>
-    : IDialogueNode<TDialogueContent, TChoiceContent>
+internal sealed class Node<TDialogueContent, TChoiceContent>
+    : INode<TDialogueContent, TChoiceContent>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="DialogueNode{TDialogueContent, TChoiceContent}"/> class.
+    /// Initializes a new instance of the <see cref="Node{TDialogueContent,TChoiceContent}"/> class.
     /// </summary>
     /// <param name="id">
     /// The internal identifier assigned to this node by <see cref="NodeIdRegistry{TUserId}"/>.
@@ -28,16 +28,19 @@ internal sealed class DialogueNode<TDialogueContent, TChoiceContent>
     /// <param name="choices">
     /// The ordered list of choices the user may take from this node.
     /// </param>
-    internal DialogueNode(
+    /// <exception cref="ArgumentException">
+    /// Throws when there are no choices provided.
+    /// </exception>
+    internal Node(
         NodeId id,
         TDialogueContent content,
-        IReadOnlyList<DialogueChoice<TChoiceContent>> choices)
+        IReadOnlyList<Choice<TChoiceContent>> choices)
     {
         this.Id = id;
         this.Content = content;
         this.Choices = choices is { Count: > 0 }
             ? choices
-            : throw new ArgumentNullException(nameof(choices), "Each dialogue node must provide at least one choice.");
+            : throw new ArgumentException("Each dialogue node must provide at least one choice.", nameof(choices));
     }
 
     /// <inheritdoc/>
@@ -47,5 +50,5 @@ internal sealed class DialogueNode<TDialogueContent, TChoiceContent>
     public TDialogueContent Content { get; }
 
     /// <inheritdoc/>
-    public IReadOnlyList<IDialogueChoice<TChoiceContent>> Choices { get; }
+    public IReadOnlyList<IChoice<TChoiceContent>> Choices { get; }
 }

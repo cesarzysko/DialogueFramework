@@ -1,4 +1,4 @@
-// <copyright file="IDialogueNodeBuilder.cs" company="SPS">
+// <copyright file="INodeBuilder.cs" company="SPS">
 // Copyright (c) SPS. All rights reserved.
 // </copyright>
 
@@ -6,7 +6,7 @@ namespace DialogueFramework;
 
 /// <summary>
 /// A builder for constructing a dialogue graph node by node, culminating in an
-/// <see cref="IDialogueRunner{TDialogueContent,TChoiceContent}"/> that traverses the finished graph.
+/// <see cref="IRunner{TDialogueContent,TChoiceContent}"/> that traverses the finished graph.
 /// </summary>
 /// <typeparam name="TRegistryKey">
 /// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
@@ -20,27 +20,10 @@ namespace DialogueFramework;
 /// <typeparam name="TChoiceContent">
 /// The type of displayable data carried by each choice.
 /// </typeparam>
-public interface IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent>
+public interface INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent>
     where TUserId : notnull
     where TRegistryKey : notnull
 {
-    /// <summary>
-    /// Begins defining a branching node with multiple selectable choices.
-    /// </summary>
-    /// <param name="userId">
-    /// A unique user-defined identifier for this node.
-    /// </param>
-    /// <param name="dialogueContent">
-    /// The data to display when the runner arrives at this node.
-    /// </param>
-    /// <returns>
-    /// A <see cref="IDialogueNodeChoiceBuilder{TRegistryKey,TUserId,TDialogueContent,TChoiceContent}"/> for adding
-    /// choices to this node.
-    /// </returns>
-    public IDialogueNodeChoiceBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> AddMultiChoiceNode(
-        TUserId userId,
-        TDialogueContent dialogueContent);
-
     /// <summary>
     /// Creates a dialogue node with a single choice leading to another dialogue node.
     /// </summary>
@@ -62,7 +45,7 @@ public interface IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, T
     /// <returns>
     /// This builder instance, enabling method chaining.
     /// </returns>
-    public IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> AddLinearNode(
+    public INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> AddLinearNode(
         TUserId userId,
         TDialogueContent dialogueContent,
         TUserId targetUserId,
@@ -87,11 +70,28 @@ public interface IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, T
     /// <returns>
     /// This builder instance, enabling method chaining.
     /// </returns>
-    public IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> AddTerminalNode(
+    public INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> AddTerminalNode(
         TUserId userId,
         TDialogueContent dialogueContent,
         TChoiceContent? choiceContent = default,
         IAction? action = null);
+
+    /// <summary>
+    /// Begins defining a branching node with multiple selectable choices.
+    /// </summary>
+    /// <param name="userId">
+    /// A unique user-defined identifier for this node.
+    /// </param>
+    /// <param name="dialogueContent">
+    /// The data to display when the runner arrives at this node.
+    /// </param>
+    /// <returns>
+    /// A <see cref="IChoiceBuilder{TRegistryKey,TUserId,TDialogueContent,TChoiceContent}"/> for adding
+    /// choices to this node.
+    /// </returns>
+    public IChoiceBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> AddMultiChoiceNode(
+        TUserId userId,
+        TDialogueContent dialogueContent);
 
     /// <summary>
     /// Constructs the dialogue graph from all previously added nodes and returns a runner positioned at the specified
@@ -105,10 +105,10 @@ public interface IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, T
     /// The USER-defined identifier of the node at which the runner should begin.
     /// </param>
     /// <returns>
-    /// An <see cref="IDialogueRunner{TDialogueContent,TChoiceContent}"/> ready to traverse the
+    /// An <see cref="IRunner{TDialogueContent,TChoiceContent}"/> ready to traverse the
     /// constructed graph.
     /// </returns>
-    public IDialogueRunner<TDialogueContent, TChoiceContent> BuildRunner(
+    public IRunner<TDialogueContent, TChoiceContent> BuildRunner(
         IValueRegistry<TRegistryKey>? valueRegistry,
         TUserId startNode);
 
@@ -139,5 +139,5 @@ public interface IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, T
     internal void AddDialogueNodeInternal(
         TUserId userId,
         TDialogueContent dialogueContent,
-        IReadOnlyList<DialogueChoice<TChoiceContent>> choices);
+        IReadOnlyList<Choice<TChoiceContent>> choices);
 }

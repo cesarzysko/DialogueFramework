@@ -43,7 +43,7 @@ public class ReadOnlyValueHandle<TValue>
     /// <param name="value">
     /// The new value stored by the handle.
     /// </param>
-    protected void WriteValue(TValue value)
+    private protected void WriteValue(TValue value)
     {
         this.wrappedValue.Value = value;
     }

@@ -15,7 +15,7 @@ public class DialogueBranchingTests
     [Fact]
     public void Dialogue_BranchIntoB_Correctly()
     {
-        IDialogueRunner<string, string> runner = GetDialogueRunner();
+        IRunner<string, string> runner = GetDialogueRunner();
 
         Assert.Equal("Welcome, traveler.", runner.Current?.Content);
 
@@ -49,7 +49,7 @@ public class DialogueBranchingTests
     [Fact]
     public void Dialogue_BranchIntoC_Correctly()
     {
-        IDialogueRunner<string, string> runner = GetDialogueRunner();
+        IRunner<string, string> runner = GetDialogueRunner();
 
         Assert.Equal("Welcome, traveler.", runner.Current?.Content);
 
@@ -77,14 +77,13 @@ public class DialogueBranchingTests
         Assert.False(endChooseSuccess);
     }
 
-    private static IDialogueRunner<string, string> GetDialogueRunner()
+    private static IRunner<string, string> GetDialogueRunner()
     {
         return DialogueBuilderFactory.CreateBuilder<string, string, string, string>()
             .AddLinearNode(StringIds.MsgA1, "Welcome, traveler.", StringIds.MsgA2, "Continue")
             .AddMultiChoiceNode(StringIds.MsgA2, "You arrive at the crossroads.")
-                .WithChoice(StringIds.MsgB1, "Take the left path.")
-                .WithChoice(StringIds.MsgC1, "Take the right path.")
-            .EndNode()
+                .Choice(StringIds.MsgB1, "Take the left path.")
+                .LastChoice(StringIds.MsgC1, "Take the right path.")
             .AddTerminalNode(StringIds.MsgB1, "You encounter a peaceful village.")
             .AddTerminalNode(StringIds.MsgC1, "You walk into a dark forest.")
             .BuildRunner(null, StringIds.MsgA1);

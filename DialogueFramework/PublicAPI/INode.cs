@@ -1,4 +1,4 @@
-// <copyright file="IDialogueNode.cs" company="SPS">
+// <copyright file="INode.cs" company="SPS">
 // Copyright (c) SPS. All rights reserved.
 // </copyright>
 
@@ -13,7 +13,7 @@ namespace DialogueFramework;
 /// <typeparam name="TChoiceContent">
 /// The type of displayable data attached to each of the node's choices.
 /// </typeparam>
-public interface IDialogueNode<out TDialogueContent, out TChoiceContent>
+public interface INode<out TDialogueContent, out TChoiceContent>
 {
     /// <summary>
     /// Gets the data to display when the runner arrives at this node.
@@ -23,7 +23,7 @@ public interface IDialogueNode<out TDialogueContent, out TChoiceContent>
     /// <summary>
     /// Gets the set of choices the user can take from this node.
     /// </summary>
-    internal IReadOnlyList<IDialogueChoice<TChoiceContent>> Choices { get; }
+    internal IReadOnlyList<IChoice<TChoiceContent>> Choices { get; }
 
     /// <summary>
     /// Gets the internal identifier assigned to this node by the framework.

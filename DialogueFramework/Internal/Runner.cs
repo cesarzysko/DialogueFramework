@@ -1,12 +1,12 @@
-// <copyright file="DialogueRunner.cs" company="SPS">
+// <copyright file="Runner.cs" company="SPS">
 // Copyright (c) SPS. All rights reserved.
 // </copyright>
 
 namespace DialogueFramework;
 
 /// <summary>
-/// The default implementation of <see cref="IDialogueRunner{TDialogueContent,TChoiceContent}"/> that
-/// traverses a <see cref="DialogueGraph{TDialogueContent,TChoiceContent}"/> in response to player choices.
+/// The default implementation of <see cref="IRunner{TDialogueContent,TChoiceContent}"/> that
+/// traverses a <see cref="Graph{TDialogueContent,TChoiceContent}"/> in response to player choices.
 /// </summary>
 /// <typeparam name="TRegistryKey">
 /// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
@@ -17,17 +17,17 @@ namespace DialogueFramework;
 /// <typeparam name="TChoiceContent">
 /// The type of displayable data carried by each choice.
 /// </typeparam>
-internal sealed class DialogueRunner<TRegistryKey, TDialogueContent, TChoiceContent>
-    : IDialogueRunner<TDialogueContent, TChoiceContent>
+internal sealed class Runner<TRegistryKey, TDialogueContent, TChoiceContent>
+    : IRunner<TDialogueContent, TChoiceContent>
     where TRegistryKey : notnull
 {
-    private readonly DialogueGraph<TDialogueContent, TChoiceContent> graph;
+    private readonly Graph<TDialogueContent, TChoiceContent> graph;
     private readonly IValueRegistry<TRegistryKey>? valueRegistry;
     private readonly NodeId startNode;
     private bool reachedTerminalNode;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DialogueRunner{TRegistryKey, TDialogueContent, TChoiceContent}"/> class.
+    /// Initializes a new instance of the <see cref="Runner{TRegistryKey,TDialogueContent,TChoiceContent}"/> class.
     /// </summary>
     /// <param name="graph">
     /// The dialogue graph to traverse.
@@ -38,8 +38,8 @@ internal sealed class DialogueRunner<TRegistryKey, TDialogueContent, TChoiceCont
     /// <param name="startNode">
     /// The internal identifier of the node at which traversal should begin.
     /// </param>
-    internal DialogueRunner(
-        DialogueGraph<TDialogueContent, TChoiceContent> graph,
+    internal Runner(
+        Graph<TDialogueContent, TChoiceContent> graph,
         IValueRegistry<TRegistryKey>? valueRegistry,
         NodeId startNode)
     {
@@ -50,7 +50,7 @@ internal sealed class DialogueRunner<TRegistryKey, TDialogueContent, TChoiceCont
     }
 
     /// <inheritdoc/>
-    public IDialogueNode<TDialogueContent, TChoiceContent>? Current { get; private set; }
+    public INode<TDialogueContent, TChoiceContent>? Current { get; private set; }
 
     /// <inheritdoc/>
     public void Reset()
@@ -60,7 +60,7 @@ internal sealed class DialogueRunner<TRegistryKey, TDialogueContent, TChoiceCont
     }
 
     /// <inheritdoc/>
-    public IReadOnlyList<IDialogueChoice<TChoiceContent>> GetAvailableChoices()
+    public IReadOnlyList<IChoice<TChoiceContent>> GetAvailableChoices()
     {
         if (this.Current == null)
         {
@@ -73,7 +73,7 @@ internal sealed class DialogueRunner<TRegistryKey, TDialogueContent, TChoiceCont
     }
 
     /// <inheritdoc/>
-    public IReadOnlyList<IDialogueChoice<TChoiceContent>> GetChoices()
+    public IReadOnlyList<IChoice<TChoiceContent>> GetChoices()
     {
         if (this.Current == null)
         {
@@ -84,12 +84,22 @@ internal sealed class DialogueRunner<TRegistryKey, TDialogueContent, TChoiceCont
     }
 
     /// <inheritdoc/>
-    public bool Choose(IDialogueChoice<TChoiceContent> choice)
+    public bool Choose(IChoice<TChoiceContent> choice)
     {
+        if (this.reachedTerminalNode)
+        {
+            throw new InvalidOperationException("The runner has already reached a terminal node.");
+        }
+
         ArgumentNullException.ThrowIfNull(choice);
         if (this.Current == null || !this.Current.Choices.Contains(choice))
         {
-            throw new ArgumentException("Choice not from current node.", nameof(choice));
+            throw new ArgumentException("Choice is not from the current node.", nameof(choice));
+        }
+
+        if (!choice.Condition?.Evaluate(this.valueRegistry) ?? false)
+        {
+            throw new ArgumentException("Choice does not meet the condition specified.", nameof(choice));
         }
 
         choice.Action?.Execute(this.valueRegistry);

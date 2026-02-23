@@ -1,4 +1,4 @@
-// <copyright file="DialogueGraph.cs" company="SPS">
+// <copyright file="Graph.cs" company="SPS">
 // Copyright (c) SPS. All rights reserved.
 // </copyright>
 
@@ -6,7 +6,7 @@ namespace DialogueFramework;
 
 /// <summary>
 /// An immutable dictionary of dialogue nodes, indexed by their internal <see cref="NodeId"/>, used by
-/// <see cref="DialogueRunner{TRegistryKey,TDialogueContent,TChoiceContent}"/> to resolve choice targets during
+/// <see cref="Runner{TRegistryKey,TDialogueContent,TChoiceContent}"/> to resolve choice targets during
 /// traversal.
 /// </summary>
 /// <typeparam name="TDialogueContent">
@@ -15,10 +15,10 @@ namespace DialogueFramework;
 /// <typeparam name="TChoiceContent">
 /// The type of displayable data carried by each choice.
 /// </typeparam>
-internal sealed class DialogueGraph<TDialogueContent, TChoiceContent>
+internal sealed class Graph<TDialogueContent, TChoiceContent>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="DialogueGraph{TDialogueContent, TChoiceContent}"/>
+    /// Initializes a new instance of the <see cref="Graph{TDialogueContent,TChoiceContent}"/>
     /// class.
     /// </summary>
     /// <param name="nodes">
@@ -27,12 +27,12 @@ internal sealed class DialogueGraph<TDialogueContent, TChoiceContent>
     /// <exception cref="ArgumentException">
     /// Thrown if any two nodes in <paramref name="nodes"/> share the same <see cref="NodeId"/>.
     /// </exception>
-    internal DialogueGraph(IEnumerable<IDialogueNode<TDialogueContent, TChoiceContent>> nodes)
+    internal Graph(IEnumerable<INode<TDialogueContent, TChoiceContent>> nodes)
     {
         this.Nodes = CreateGraph(nodes);
     }
 
-    private Dictionary<int, IDialogueNode<TDialogueContent, TChoiceContent>> Nodes { get; }
+    private Dictionary<int, INode<TDialogueContent, TChoiceContent>> Nodes { get; }
 
     /// <summary>
     /// Retrieves the node with the given internal identifier.
@@ -46,7 +46,7 @@ internal sealed class DialogueGraph<TDialogueContent, TChoiceContent>
     /// <exception cref="KeyNotFoundException">
     /// Thrown when no node with the given <paramref name="id"/> exists in the graph.
     /// </exception>
-    public IDialogueNode<TDialogueContent, TChoiceContent> GetDialogueNode(NodeId id)
+    public INode<TDialogueContent, TChoiceContent> GetDialogueNode(NodeId id)
     {
         return this.Nodes[id.Value];
     }
@@ -63,16 +63,32 @@ internal sealed class DialogueGraph<TDialogueContent, TChoiceContent>
     /// <exception cref="ArgumentException">
     /// Thrown when two or more nodes share the same <see cref="NodeId"/>.
     /// </exception>
-    private static Dictionary<int, IDialogueNode<TDialogueContent, TChoiceContent>> CreateGraph(
-        IEnumerable<IDialogueNode<TDialogueContent, TChoiceContent>> nodes)
+    private static Dictionary<int, INode<TDialogueContent, TChoiceContent>> CreateGraph(
+        IEnumerable<INode<TDialogueContent, TChoiceContent>> nodes)
     {
+        Dictionary<int, INode<TDialogueContent, TChoiceContent>> graph;
+
         try
         {
-            return nodes.ToDictionary(n => n.Id.Value);
+            graph = nodes.ToDictionary(n => n.Id.Value);
         }
         catch (ArgumentException ex)
         {
             throw new ArgumentException("Duplicate node IDs found in graph.", nameof(nodes), ex);
         }
+
+        NodeId[] missingTargets = graph.Values
+            .SelectMany(node => node.Choices)
+            .Select(choice => choice.Target)
+            .Where(t => t != null && !graph.ContainsKey(t.Value.Value))
+            .Select(t => t!.Value)
+            .ToArray();
+
+        if (missingTargets.Length != 0)
+        {
+            throw new TargetException(missingTargets);
+        }
+
+        return graph;
     }
 }

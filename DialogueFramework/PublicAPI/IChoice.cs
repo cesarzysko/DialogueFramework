@@ -1,4 +1,4 @@
-// <copyright file="IDialogueChoice.cs" company="SPS">
+// <copyright file="IChoice.cs" company="SPS">
 // Copyright (c) SPS. All rights reserved.
 // </copyright>
 
@@ -10,7 +10,7 @@ namespace DialogueFramework;
 /// <typeparam name="TContent">
 /// The type of displayable data attached to the choice.
 /// </typeparam>
-public interface IDialogueChoice<out TContent>
+public interface IChoice<out TContent>
 {
     /// <summary>
     /// Gets the data to display when presenting this choice to the user.

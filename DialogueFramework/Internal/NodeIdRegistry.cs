@@ -157,7 +157,7 @@ internal sealed class NodeIdRegistry<TUserId>
     {
         if (this.UserToInternal.TryGetValue(userId, out var existing))
         {
-            this.Logger?.LogDebug($"Returning existing registration \"{existing.Value}\" for \"{userId}\" (registered by another thread).");
+            this.Logger?.LogDebug($"Returning existing registration \"{existing.Value}\" for \"{userId}\".");
             return existing;
         }
 

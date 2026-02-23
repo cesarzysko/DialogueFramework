@@ -1,4 +1,4 @@
-// <copyright file="IDialogueRunner.cs" company="SPS">
+// <copyright file="IRunner.cs" company="SPS">
 // Copyright (c) SPS. All rights reserved.
 // </copyright>
 
@@ -14,12 +14,12 @@ namespace DialogueFramework;
 /// <typeparam name="TChoiceContent">
 /// The type of displayable data carried by each dialogue choice.
 /// </typeparam>
-public interface IDialogueRunner<out TDialogueContent, TChoiceContent>
+public interface IRunner<out TDialogueContent, TChoiceContent>
 {
     /// <summary>
     /// Gets the node the runner is currently positioned on.
     /// </summary>
-    public IDialogueNode<TDialogueContent, TChoiceContent>? Current { get; }
+    public INode<TDialogueContent, TChoiceContent>? Current { get; }
 
     /// <summary>
     /// Returns the choices of the current node that satisfy their associated conditions, and are therefore eligible
@@ -28,7 +28,7 @@ public interface IDialogueRunner<out TDialogueContent, TChoiceContent>
     /// <returns>
     /// A snapshot of the choices currently available.
     /// </returns>
-    public IReadOnlyList<IDialogueChoice<TChoiceContent>> GetAvailableChoices();
+    public IReadOnlyList<IChoice<TChoiceContent>> GetAvailableChoices();
 
     /// <summary>
     /// Returns all choices of the current node, regardless of whether their conditions are satisfied.
@@ -36,7 +36,7 @@ public interface IDialogueRunner<out TDialogueContent, TChoiceContent>
     /// <returns>
     /// A snapshot of every choice defined on the current node, regardless of whether their conditions are satisfied.
     /// </returns>
-    public IReadOnlyList<IDialogueChoice<TChoiceContent>> GetChoices();
+    public IReadOnlyList<IChoice<TChoiceContent>> GetChoices();
 
     /// <summary>
     /// Executes the action associated with <paramref name="choice"/> and, if the choice leads to another
@@ -53,12 +53,13 @@ public interface IDialogueRunner<out TDialogueContent, TChoiceContent>
     /// Thrown when <paramref name="choice"/> is <see langword="null"/>.
     /// </exception>
     /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="choice"/> does not belong to the current node.
+    /// Thrown when <paramref name="choice"/> does not belong to the current node;
+    /// or when the specified condition is not met.
     /// </exception>
     /// <exception cref="InvalidOperationException">
     /// Thrown when the choice's target node is not found in the dialogue graph.
     /// </exception>
-    public bool Choose(IDialogueChoice<TChoiceContent> choice);
+    public bool Choose(IChoice<TChoiceContent> choice);
 
     /// <summary>
     /// Returns whether the dialogue has reached a terminal choice and can no longer advance.

@@ -1,20 +1,20 @@
-// <copyright file="DialogueChoice.cs" company="SPS">
+// <copyright file="Choice.cs" company="SPS">
 // Copyright (c) SPS. All rights reserved.
 // </copyright>
 
 namespace DialogueFramework;
 
 /// <summary>
-/// An immutable, internal implementation of <see cref="IDialogueChoice{TContent}"/>.
+/// An immutable, internal implementation of <see cref="IChoice{TContent}"/>.
 /// </summary>
 /// <typeparam name="TContent">
 /// The type of displayable data carried by this choice.
 /// </typeparam>
-internal sealed class DialogueChoice<TContent>
-    : IDialogueChoice<TContent>
+internal sealed class Choice<TContent>
+    : IChoice<TContent>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="DialogueChoice{TContent}"/> class.
+    /// Initializes a new instance of the <see cref="Choice{TContent}"/> class.
     /// </summary>
     /// <param name="content">
     /// The data to display when presenting this choice to the user.
@@ -28,7 +28,7 @@ internal sealed class DialogueChoice<TContent>
     /// <param name="action">
     /// The effect executed when this choice is selected.
     /// </param>
-    internal DialogueChoice(
+    internal Choice(
         TContent? content,
         NodeId? target = null,
         ICondition? condition = null,

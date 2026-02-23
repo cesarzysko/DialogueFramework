@@ -30,7 +30,7 @@ public static class AdventureProvider
     /// <returns>
     /// The runner instance for the adventure.
     /// </returns>
-    public static IDialogueRunner<string, string> BuildAdventure(SceneId startingSceneId = SceneId.Intro, ILogger? logger = null)
+    public static IRunner<string, string> BuildAdventure(SceneId startingSceneId = SceneId.Intro, ILogger? logger = null)
     {
         return DialogueBuilderFactory.CreateBuilder<string, SceneId, string, string>(logger)
 
@@ -45,31 +45,29 @@ public static class AdventureProvider
             .AddMultiChoiceNode(
                 SceneId.CavernEntrance,
                 "The cavern is cold and damp. Three passages stretch before you: left, center, and right.")
-                .WithChoice(SceneId.LeftPassage, "Take the left passage.")
-                .WithChoice(SceneId.CenterPassage, "Take the center passage.")
-                .WithChoice(SceneId.RightPassage, "Take the right passage.")
-                .EndNode()
+                .Choice(SceneId.LeftPassage, "Take the left passage.")
+                .Choice(SceneId.CenterPassage, "Take the center passage.")
+                .LastChoice(SceneId.RightPassage, "Take the right passage.")
 
             // ===  LEFT PASSAGE - GOBLIN ENCOUNTER ===
             .AddMultiChoiceNode(
                 SceneId.LeftPassage,
                 "You encounter a goblin blocking your path! It snarls menacingly.")
-                .WithChoice(
+                .Choice(
                     SceneId.FightGoblin,
                     $"{AttackLabel}Fight the goblin.",
                     action: new ModifyResourceAction(ValueRegistry.Health, -15))
-                .WithChoice(
+                .Choice(
                     SceneId.CastFireballOnGoblin,
                     $"{SpellLabel}Cast a fireball on the goblin.",
                     action: new ModifyResourceAction(ValueRegistry.Mana, -20))
-                .WithChoice(
+                .Choice(
                     SceneId.BribeGoblin,
                     $"{BribeLabel}Offer some gold to the goblin.",
                     action: new ModifyResourceAction(ValueRegistry.Gold, -999_999))
-                .WithChoice(
+                .LastChoice(
                     SceneId.RunAway,
                     $"{FleeLabel}Run back to the entrance.")
-                .EndNode()
 
             .AddLinearNode(
                 SceneId.FightGoblin,
@@ -102,16 +100,15 @@ public static class AdventureProvider
             .AddMultiChoiceNode(
                 SceneId.CenterPassage,
                 "You discover a mystical fountain glowing with blue light. The water looks rejuvenating.")
-                .WithChoice(
+                .Choice(
                     SceneId.DrinkFromFountain,
                     $"{DrinkLabel}Drink from the fountain.",
                     action: new CompositeAction(
                         new ModifyResourceAction(ValueRegistry.Health, 30),
                         new ModifyResourceAction(ValueRegistry.Mana, 20)))
-                .WithChoice(
+                .LastChoice(
                     SceneId.IgnoreFountain,
                     $"{IgnoreLabel}Leave the fountain alone.")
-                .EndNode()
 
             .AddLinearNode(
                 SceneId.DrinkFromFountain,
@@ -128,28 +125,27 @@ public static class AdventureProvider
             .AddMultiChoiceNode(
                 SceneId.RightPassage,
                 "A MASSIVE DRAGON blocks your path! Its eyes glow with ancient intelligence.\nIt speaks: \"Mortal, you may pass... but for a price.\"")
-                .WithChoice(
+                .Choice(
                     SceneId.PhysicalAttackDragon,
                     $"{AttackLabel} Fight the dragon.",
                     action: new CompositeAction(
                         new ModifyResourceAction(ValueRegistry.Health, -90),
                         new ModifyResourceAction(ValueRegistry.Gold, 150)))
-                .WithChoice(
+                .Choice(
                     SceneId.MagicAttackDragon,
                     $"{SpellLabel}Cast a powerful spell.",
                     condition: new HasMinimumResourceCondition(ValueRegistry.Mana, 100),
                     action: new CompositeAction(
                         new ModifyResourceAction(ValueRegistry.Mana, -100),
                         new ModifyResourceAction(ValueRegistry.Gold, 200)))
-                .WithChoice(
+                .Choice(
                     SceneId.PayDragon,
                     $"{BribeLabel}Pay the dragon's toll.",
                     condition: new HasMinimumResourceCondition(ValueRegistry.Gold, 100),
                     action: new ModifyResourceAction(ValueRegistry.Gold, -100))
-                .WithChoice(
+                .LastChoice(
                     SceneId.RunFromDragon,
                     $"{FleeLabel}This is madness! Run away!")
-                .EndNode()
 
             .AddLinearNode(
                 SceneId.PhysicalAttackDragon,
@@ -176,19 +172,18 @@ public static class AdventureProvider
             .AddMultiChoiceNode(
                 SceneId.TreasureRoom,
                 "You enter the treasure room! Piles of gold and magical artifacts surround you.\nYou can only take one item, which one will you get?")
-                .WithChoice(
+                .Choice(
                     SceneId.TakeChalice,
                     "Take the golden chalice.",
                     action: new ModifyResourceAction(ValueRegistry.Gold, 100))
-                .WithChoice(
+                .Choice(
                     SceneId.TakePotion,
                     "Take the health potion.",
                     action: new ModifyResourceAction(ValueRegistry.Health, 50))
-                .WithChoice(
+                .LastChoice(
                     SceneId.TakeCrystal,
                     "Take the mana crystal",
                     action: new ModifyResourceAction(ValueRegistry.Mana, 50))
-                .EndNode()
 
             .AddLinearNode(
                 SceneId.TakeChalice,
