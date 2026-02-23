@@ -112,7 +112,7 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
         TDialogueContent dialogueContent,
         IReadOnlyList<Choice<TChoiceContent>> choices)
     {
-        NodeId id = this.registry.GetOrRegister(userId);
+        NodeId id = this.GetInternalId(userId);
         var dialogueNode = new Node<TDialogueContent, TChoiceContent>(id, dialogueContent, choices);
         this.nodes.Add(dialogueNode);
     }
@@ -127,7 +127,7 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
         private readonly INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> parent;
         private readonly TUserId userId;
         private readonly TDialogueContent dialogueContent;
-        private readonly List<Choice<TChoiceContent>> choices;
+        private readonly List<Choice<TChoiceContent>> choices = [];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ChoiceBuilder"/> class.
@@ -149,7 +149,6 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
             this.parent = parent;
             this.userId = userId;
             this.dialogueContent = dialogueContent;
-            this.choices = [];
         }
 
         /// <inheritdoc/>
