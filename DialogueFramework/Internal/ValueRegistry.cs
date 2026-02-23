@@ -5,8 +5,8 @@
 namespace DialogueFramework;
 
 /// <summary>
-/// The default implementation of <see cref="IValueRegistry{TKey}"/>, storing values in a dictionary keyed by
-/// <see cref="ValueHandle{TValue}"/> instances.
+/// The default implementation of <see cref="IValueRegistry{TKey}"/>, creating and managing the uniqueness of
+/// registered values.
 /// </summary>
 /// <typeparam name="TKey">
 /// The user-defined type used to name a registry entry at registration time.
@@ -14,54 +14,56 @@ namespace DialogueFramework;
 internal sealed class ValueRegistry<TKey> : IValueRegistry<TKey>
     where TKey : notnull
 {
-    // TODO: Add a logger field and use it to log exceptions.
-    private readonly HashSet<TKey> registeredKeys = [];
-    private readonly Dictionary<object, object?> variables = [];
+    private readonly ILogger? logger;
+    private readonly HashSet<TKey> keys = [];
 
-    /// <inheritdoc/>
-    public ValueHandle<TValue> Register<TValue>(TKey key, TValue initialValue = default!)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValueRegistry{TKey}"/> class.
+    /// </summary>
+    /// <param name="logger">
+    /// The optional logger to use to print internal diagnostics.
+    /// </param>
+    internal ValueRegistry(ILogger? logger)
     {
-        if (!this.registeredKeys.Add(key))
-        {
-            throw new ArgumentException($"The key \"{key}\" is already registered.", nameof(key));
-        }
-
-        var variableKey = new ValueHandle<TValue>();
-        this.variables.Add(variableKey, initialValue);
-        return variableKey;
+        this.logger = logger;
     }
 
     /// <inheritdoc/>
-    public TValue Get<TValue>(ValueHandle<TValue> handle)
+    public ReadWriteValueHandle<TValue> RegisterReadWrite<TValue>(TKey key, TValue initialValue = default!)
     {
-        if (!this.variables.TryGetValue(handle, out object? obj))
+        if (this.keys.Add(key))
         {
-            throw new ArgumentException("The provided key is not present in the registry.", nameof(handle));
+            return new ReadWriteValueHandle<TValue>(initialValue);
         }
 
-        if (obj is TValue typedValue)
-        {
-            return typedValue;
-        }
-
-        // TODO: Use typed object wrappers to store values in the dictionary for better type checks.
-        if (obj != null)
-        {
-            throw new ArgumentException("The provided key does not match the requested value type.", nameof(handle));
-        }
-
-        return default!;
+        var exc = new ArgumentException($"The key \"{key}\" is already registered.", nameof(key));
+        this.logger?.LogError(exc.Message);
+        throw exc;
     }
 
     /// <inheritdoc/>
-    public void Set<TValue>(ValueHandle<TValue> handle, TValue value)
+    public ReadOnlyValueHandle<TValue> RegisterReadOnly<TValue>(TKey key, TValue initialValue)
+        where TValue : notnull
     {
-        if (!this.variables.ContainsKey(handle))
+        if (this.keys.Add(key))
         {
-            throw new ArgumentException("The provided key is not present in the registry.", nameof(handle));
+            return new ReadOnlyValueHandle<TValue>(initialValue);
         }
 
-        // TODO: Use typed object wrappers to store values in the dictionary for better type checks.
-        this.variables[handle] = value;
+        var exc = new ArgumentException($"The key \"{key}\" is already registered.", nameof(key));
+        this.logger?.LogError(exc.Message);
+        throw exc;
+    }
+
+    /// <inheritdoc/>
+    public TValue Get<TValue>(ReadOnlyValueHandle<TValue> handle)
+    {
+        return handle.Read();
+    }
+
+    /// <inheritdoc/>
+    public void Set<TValue>(ReadWriteValueHandle<TValue> handle, TValue value)
+    {
+        handle.Write(value);
     }
 }

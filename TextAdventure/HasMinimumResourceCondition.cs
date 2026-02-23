@@ -9,7 +9,7 @@ namespace DialogueFramework.Tests.XUnit;
 /// </summary>
 public class HasMinimumResourceCondition : ICondition
 {
-    private readonly ValueHandle<int> resourceHandle;
+    private readonly ReadOnlyValueHandle<int> resourceHandle;
     private readonly int minimumAmount;
 
     /// <summary>
@@ -21,7 +21,7 @@ public class HasMinimumResourceCondition : ICondition
     /// <param name="minimumAmount">
     /// The minimum amount of the resource the player needs to have.
     /// </param>
-    public HasMinimumResourceCondition(ValueHandle<int> resourceHandle, int minimumAmount)
+    public HasMinimumResourceCondition(ReadOnlyValueHandle<int> resourceHandle, int minimumAmount)
     {
         this.resourceHandle = resourceHandle;
         this.minimumAmount = minimumAmount;

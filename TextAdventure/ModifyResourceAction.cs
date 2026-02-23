@@ -9,7 +9,7 @@ namespace DialogueFramework.Tests.XUnit;
 /// </summary>
 public class ModifyResourceAction : IAction
 {
-    private readonly ValueHandle<int> resourceHandle;
+    private readonly ReadWriteValueHandle<int> resourceHandle;
     private readonly int amount;
 
     /// <summary>
@@ -21,7 +21,7 @@ public class ModifyResourceAction : IAction
     /// <param name="amount">
     /// The amount of resource to modify.
     /// </param>
-    public ModifyResourceAction(ValueHandle<int> resourceHandle, int amount)
+    public ModifyResourceAction(ReadWriteValueHandle<int> resourceHandle, int amount)
     {
         this.resourceHandle = resourceHandle;
         this.amount = amount;

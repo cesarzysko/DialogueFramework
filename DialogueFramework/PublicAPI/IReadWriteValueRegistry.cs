@@ -13,7 +13,7 @@ public interface IReadWriteValueRegistry : IReadOnlyValueRegistry
     /// Updates the value associated with the given key.
     /// </summary>
     /// <param name="handle">
-    /// The key returned by <see cref="IValueRegistry{TKey}.Register{TValue}"/> for the target entry.
+    /// The key returned by <see cref="IValueRegistry{TKey}.RegisterReadWrite{TValue}"/> for the target entry.
     /// </param>
     /// <param name="value">
     /// The new value to assign to the entry.
@@ -21,8 +21,5 @@ public interface IReadWriteValueRegistry : IReadOnlyValueRegistry
     /// <typeparam name="TValue">
     /// The type of the value to set. Must match the type used at registration.
     /// </typeparam>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="handle"/> does not correspond to any registered entry.
-    /// </exception>
-    public void Set<TValue>(ValueHandle<TValue> handle, TValue value);
+    public void Set<TValue>(ReadWriteValueHandle<TValue> handle, TValue value);
 }

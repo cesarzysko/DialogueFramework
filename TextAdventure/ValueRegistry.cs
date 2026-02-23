@@ -17,15 +17,15 @@ public static class ValueRegistry
     /// <summary>
     /// Handle used to retrieve or set health.
     /// </summary>
-    public static readonly ValueHandle<int> Health = Registry.Register("Health", 100);
+    public static readonly ReadWriteValueHandle<int> Health = Registry.RegisterReadWrite("Health", 100);
 
     /// <summary>
     /// Handle used to retrieve or set mana.
     /// </summary>
-    public static readonly ValueHandle<int> Mana = Registry.Register("Mana", 100);
+    public static readonly ReadWriteValueHandle<int> Mana = Registry.RegisterReadWrite("Mana", 100);
 
     /// <summary>
     /// Handle used to retrieve or set gold.
     /// </summary>
-    public static readonly ValueHandle<int> Gold = Registry.Register("Gold", 100);
+    public static readonly ReadWriteValueHandle<int> Gold = Registry.RegisterReadWrite("Gold", 100);
 }

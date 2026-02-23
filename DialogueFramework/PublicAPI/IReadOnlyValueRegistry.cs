@@ -13,7 +13,7 @@ public interface IReadOnlyValueRegistry
     /// Retrieves the value associated with the given key.
     /// </summary>
     /// <param name="handle">
-    /// The key returned by <see cref="IValueRegistry{TKey}.Register{TValue}"/> for the target entry.
+    /// The key returned by <see cref="IValueRegistry{TKey}.RegisterReadWrite{TValue}"/> for the target entry.
     /// </param>
     /// <typeparam name="TValue">
     /// The type of the value to retrieve. Must match the type used at registration.
@@ -21,9 +21,5 @@ public interface IReadOnlyValueRegistry
     /// <returns>
     /// The current value of the entry identified by <paramref name="handle"/>.
     /// </returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="handle"/> does not correspond to any registered entry,
-    /// or when <typeparamref name="TValue"/> does not match the type used at registration.
-    /// </exception>
-    public TValue Get<TValue>(ValueHandle<TValue> handle);
+    public TValue Get<TValue>(ReadOnlyValueHandle<TValue> handle);
 }

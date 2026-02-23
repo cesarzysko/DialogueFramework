@@ -14,7 +14,7 @@ public interface IValueRegistry<in TKey> : IReadWriteValueRegistry
     where TKey : notnull
 {
     /// <summary>
-    /// Registers a new entry in the registry and returns a typed key for accessing it.
+    /// Registers a new read-write entry in the registry and returns a typed key for accessing it.
     /// </summary>
     /// <param name="key">
     /// A user-defined identifier for the new entry. Must be unique within this registry.
@@ -26,8 +26,27 @@ public interface IValueRegistry<in TKey> : IReadWriteValueRegistry
     /// The type of value to store under this entry.
     /// </typeparam>
     /// <returns>
-    /// A <see cref="ValueHandle{TValue}"/> that uniquely identifies this entry.
+    /// A <see cref="ReadWriteValueHandle{TValue}"/> that uniquely identifies this entry.
     /// Store this key to use with <see cref="Get{TValue}"/> and <see cref="Set{TValue}"/>.
     /// </returns>
-    public ValueHandle<TValue> Register<TValue>(TKey key, TValue initialValue = default!);
+    public ReadWriteValueHandle<TValue> RegisterReadWrite<TValue>(TKey key, TValue initialValue = default!);
+
+    /// <summary>
+    /// Registers a new read-only entry in the registry and returns a typed key for accessing it.
+    /// </summary>
+    /// <param name="key">
+    /// A user-defined identifier for the new entry. Must be unique within this registry.
+    /// </param>
+    /// <param name="initialValue">
+    /// The value the entry holds immediately after registration.
+    /// </param>
+    /// <typeparam name="TValue">
+    /// The type of value to store under this entry.
+    /// </typeparam>
+    /// <returns>
+    /// A <see cref="ReadOnlyValueHandle{TValue}"/> that uniquely identifies this entry.
+    /// Store this key to use with <see cref="Get{TValue}"/>.
+    /// </returns>
+    public ReadOnlyValueHandle<TValue> RegisterReadOnly<TValue>(TKey key, TValue initialValue)
+        where TValue : notnull;
 }
