@@ -15,8 +15,12 @@ public class HasMinimumResourceCondition : ICondition
     /// <summary>
     /// Initializes a new instance of the <see cref="HasMinimumResourceCondition"/> class.
     /// </summary>
-    /// <param name="resourceHandle">The type of resource checked.</param>
-    /// <param name="minimumAmount">The minimum amount of the resource the player needs to have.</param>
+    /// <param name="resourceHandle">
+    /// The type of resource checked.
+    /// </param>
+    /// <param name="minimumAmount">
+    /// The minimum amount of the resource the player needs to have.
+    /// </param>
     public HasMinimumResourceCondition(ValueHandle<int> resourceHandle, int minimumAmount)
     {
         this.resourceHandle = resourceHandle;

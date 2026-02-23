@@ -21,9 +21,15 @@ public static class AdventureProvider
     /// <summary>
     /// Builds the runner for the adventure.
     /// </summary>
-    /// <param name="startingSceneId">The starting place of the adventure.</param>
-    /// <param name="logger">The optional logger used to print out internal messages.</param>
-    /// <returns>The runner instance for the adventure.</returns>
+    /// <param name="startingSceneId">
+    /// The starting place of the adventure.
+    /// </param>
+    /// <param name="logger">
+    /// The optional logger used to print out internal messages.
+    /// </param>
+    /// <returns>
+    /// The runner instance for the adventure.
+    /// </returns>
     public static IDialogueRunner<string, string> BuildAdventure(SceneId startingSceneId = SceneId.Intro, ILogger? logger = null)
     {
         return DialogueBuilderFactory.CreateBuilder<string, SceneId, string, string>(logger)

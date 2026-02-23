@@ -6,7 +6,7 @@ namespace DialogueFramework;
 
 /// <summary>
 /// A builder for constructing a dialogue graph node by node, culminating in an
-/// <see cref="IDialogueRunner{TRegistryKey,TDialogueContent,TChoiceContent}"/> that traverses the finished graph.
+/// <see cref="IDialogueRunner{TDialogueContent,TChoiceContent}"/> that traverses the finished graph.
 /// </summary>
 /// <typeparam name="TRegistryKey">
 /// The key type used to identify values in the <see cref="IValueRegistry{TKey}"/>.
@@ -98,14 +98,14 @@ public interface IDialogueNodeBuilder<TRegistryKey, TUserId, TDialogueContent, T
     /// start node, ready for traversal.
     /// </summary>
     /// <param name="valueRegistry">
-    /// The registry made available to <see cref="ICondition{TRegistryKey}"/> and <see cref="IAction{TRegistryKey}"/>
+    /// The registry made available to <see cref="ICondition"/> and <see cref="IAction"/>
     /// implementations at runtime.
     /// </param>
     /// <param name="startNode">
     /// The USER-defined identifier of the node at which the runner should begin.
     /// </param>
     /// <returns>
-    /// An <see cref="IDialogueRunner{TRegistryKey,TDialogueContent,TChoiceContent}"/> ready to traverse the
+    /// An <see cref="IDialogueRunner{TDialogueContent,TChoiceContent}"/> ready to traverse the
     /// constructed graph.
     /// </returns>
     public IDialogueRunner<TDialogueContent, TChoiceContent> BuildRunner(

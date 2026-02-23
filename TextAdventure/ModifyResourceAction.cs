@@ -15,8 +15,12 @@ public class ModifyResourceAction : IAction
     /// <summary>
     /// Initializes a new instance of the <see cref="ModifyResourceAction"/> class.
     /// </summary>
-    /// <param name="resourceHandle">The resource to modify.</param>
-    /// <param name="amount">The amount of resource to modify.</param>
+    /// <param name="resourceHandle">
+    /// The resource to modify.
+    /// </param>
+    /// <param name="amount">
+    /// The amount of resource to modify.
+    /// </param>
     public ModifyResourceAction(ValueHandle<int> resourceHandle, int amount)
     {
         this.resourceHandle = resourceHandle;

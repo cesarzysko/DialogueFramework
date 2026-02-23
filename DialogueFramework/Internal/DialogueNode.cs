@@ -5,7 +5,7 @@
 namespace DialogueFramework;
 
 /// <summary>
-/// An immutable, internal implementation of <see cref="IDialogueNode{TRegistryKey,TDialogueContent,TChoiceContent}"/>.
+/// An immutable, internal implementation of <see cref="IDialogueNode{TDialogueContent,TChoiceContent}"/>.
 /// </summary>
 /// <typeparam name="TDialogueContent">
 /// The type of displayable data attached to this node.

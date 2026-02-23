@@ -5,7 +5,7 @@
 namespace DialogueFramework;
 
 /// <summary>
-/// An immutable, internal implementation of <see cref="IDialogueChoice{TRegistryKey,TContent}"/>.
+/// An immutable, internal implementation of <see cref="IDialogueChoice{TContent}"/>.
 /// </summary>
 /// <typeparam name="TContent">
 /// The type of displayable data carried by this choice.

@@ -13,20 +13,27 @@ using System.Diagnostics.CodeAnalysis;
 /// <typeparam name="TUserId">
 /// The user-defined type used to name dialogue nodes.
 /// </typeparam>
-/// <param name="logger">
-/// An optional logger that receives debug messages.
-/// </param>
-internal sealed class NodeIdRegistry<TUserId>(
-    ILogger? logger = null)
-        where TUserId : notnull
+internal sealed class NodeIdRegistry<TUserId>
+    where TUserId : notnull
 {
     private int nextId;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NodeIdRegistry{TUserId}"/> class.
+    /// </summary>
+    /// <param name="logger">
+    /// An optional logger that receives debug messages.
+    /// </param>
+    internal NodeIdRegistry(ILogger? logger = null)
+    {
+        this.Logger = logger;
+    }
 
     private Dictionary<TUserId, NodeId> UserToInternal { get; } = new();
 
     private Dictionary<int, TUserId> InternalToUser { get; } = new();
 
-    private ILogger? Logger { get; } = logger;
+    private ILogger? Logger { get; }
 
     /// <summary>
     /// Returns the internal <see cref="NodeId"/> assigned to <paramref name="userId"/>.
