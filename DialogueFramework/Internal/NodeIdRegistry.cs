@@ -120,30 +120,6 @@ internal sealed class NodeIdRegistry<TUserId>
     }
 
     /// <summary>
-    /// Registers <paramref name="userId"/> and assigns it a new internal <see cref="NodeId"/>.
-    /// </summary>
-    /// <param name="userId">
-    /// The user-defined identifier to register. Must not already be registered.
-    /// </param>
-    /// <returns>
-    /// The newly assigned <see cref="NodeId"/>.
-    /// </returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="userId"/> has already been registered in this instance.
-    /// </exception>
-    public NodeId Register(TUserId userId)
-    {
-        if (!this.UserToInternal.ContainsKey(userId))
-        {
-            return this.RegisterInternal(userId);
-        }
-
-        string msg = $"User ID \"{userId}\" is already registered.";
-        this.Logger?.LogError(msg);
-        throw new ArgumentException(msg, nameof(userId));
-    }
-
-    /// <summary>
     /// Returns the existing internal <see cref="NodeId"/> for <paramref name="userId"/> if it has already been
     /// registered, or registers it and returns a new one.
     /// </summary>
@@ -161,9 +137,9 @@ internal sealed class NodeIdRegistry<TUserId>
             return existing;
         }
 
-        var newId = this.RegisterInternal(userId);
-        this.Logger?.LogDebug($"Registered new user ID \"{userId}\" as \"{newId.Value}\".");
-        return newId;
+        var internalId = this.RegisterInternal(userId);
+        this.Logger?.LogDebug($"Registered new user ID \"{userId}\" as \"{internalId.Value}\".");
+        return internalId;
     }
 
     /// <summary>
@@ -180,7 +156,6 @@ internal sealed class NodeIdRegistry<TUserId>
         var internalId = new NodeId(this.nextId++);
         this.UserToInternal[userId] = internalId;
         this.InternalToUser[internalId.Value] = userId;
-        this.Logger?.LogDebug($"Registering new user id \"{userId}\" as \"{internalId.Value}\".");
         return internalId;
     }
 }

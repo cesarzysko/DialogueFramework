@@ -18,11 +18,6 @@ public interface IChoice<out TContent>
     public TContent? Content { get; }
 
     /// <summary>
-    /// Gets the internal identifier of the node this choice leads to.
-    /// </summary>
-    internal NodeId? Target { get; }
-
-    /// <summary>
     /// Gets the condition that must be satisfied for this choice to appear as available.
     /// </summary>
     internal ICondition? Condition { get; }
@@ -31,4 +26,15 @@ public interface IChoice<out TContent>
     /// Gets the action executed by the runner when this choice is selected.
     /// </summary>
     internal IAction? Action { get; }
+
+    /// <summary>
+    /// Gets the internal identifier of the node this choice leads to.
+    /// </summary>
+    /// <param name="valueRegistry">
+    /// The read-only value registry used to determine the returned target node.
+    /// </param>
+    /// <returns>
+    /// The id of the target node this choice leads to.
+    /// </returns>
+    internal NodeId? GetTarget(IReadOnlyValueRegistry? valueRegistry);
 }

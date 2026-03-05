@@ -7,7 +7,7 @@ namespace DialogueFramework;
 /// <summary>
 /// Thrown when supplying a graph with nodes where choices have targets not pointing to any node in the graph.
 /// </summary>
-public class TargetException : Exception
+internal class TargetException : Exception
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="TargetException"/> class.

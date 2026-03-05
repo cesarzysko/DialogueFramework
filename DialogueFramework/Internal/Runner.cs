@@ -97,14 +97,16 @@ internal sealed class Runner<TRegistryKey, TDialogueContent, TChoiceContent>
             throw new ArgumentException("Choice is not from the current node.", nameof(choice));
         }
 
-        if (!choice.Condition?.Evaluate(this.valueRegistry) ?? false)
+        if (!(choice.Condition?.Evaluate(this.valueRegistry) ?? true))
         {
             throw new ArgumentException("Choice does not meet the condition specified.", nameof(choice));
         }
 
         choice.Action?.Execute(this.valueRegistry);
 
-        if (choice.Target == null)
+        NodeId? target = choice.GetTarget(this.valueRegistry);
+
+        if (target == null)
         {
             this.Current = null;
             this.reachedTerminalNode = true;
@@ -113,12 +115,12 @@ internal sealed class Runner<TRegistryKey, TDialogueContent, TChoiceContent>
 
         try
         {
-            this.Current = this.graph.GetDialogueNode(choice.Target.Value);
+            this.Current = this.graph.GetDialogueNode(target.Value);
             return true;
         }
         catch (KeyNotFoundException ex)
         {
-            throw new InvalidOperationException($"Target node {choice.Target.Value.Value} not found in graph.", ex);
+            throw new InvalidOperationException($"Target node {target.Value.Value} not found in graph.", ex);
         }
     }
 

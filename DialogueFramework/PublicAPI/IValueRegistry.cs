@@ -27,7 +27,7 @@ public interface IValueRegistry<in TKey> : IReadWriteValueRegistry
     /// </typeparam>
     /// <returns>
     /// A <see cref="ReadWriteValueHandle{TValue}"/> that uniquely identifies this entry.
-    /// Store this key to use with <see cref="Get{TValue}"/> and <see cref="Set{TValue}"/>.
+    /// Store this key to get or set the associated value via the registry.
     /// </returns>
     public ReadWriteValueHandle<TValue> RegisterReadWrite<TValue>(TKey key, TValue initialValue = default!);
 
@@ -42,10 +42,11 @@ public interface IValueRegistry<in TKey> : IReadWriteValueRegistry
     /// </param>
     /// <typeparam name="TValue">
     /// The type of value to store under this entry.
+    /// Value must not be null as the registered value can never be reassigned.
     /// </typeparam>
     /// <returns>
     /// A <see cref="ReadOnlyValueHandle{TValue}"/> that uniquely identifies this entry.
-    /// Store this key to use with <see cref="Get{TValue}"/>.
+    /// Store this key to get the associated value via the registry.
     /// </returns>
     public ReadOnlyValueHandle<TValue> RegisterReadOnly<TValue>(TKey key, TValue initialValue)
         where TValue : notnull;

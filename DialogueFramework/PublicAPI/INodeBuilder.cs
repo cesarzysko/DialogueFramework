@@ -113,16 +113,16 @@ public interface INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceCo
         TUserId startNode);
 
     /// <summary>
-    /// Returns the internal <see cref="NodeId"/> assigned to the given user-defined identifier, registering a new one
-    /// if the identifier has not been seen before.
+    /// Returns a function which returns the internal <see cref="NodeId"/> assigned to the given user-defined
+    /// identifier, registering a new one if the identifier has not been seen before.
     /// </summary>
     /// <param name="userId">
     /// The user-defined identifier to look up or register.
     /// </param>
     /// <returns>
-    /// The corresponding internal <see cref="NodeId"/>.
+    /// The function returning the corresponding internal <see cref="NodeId"/>.
     /// </returns>
-    internal NodeId GetInternalId(TUserId userId);
+    internal Func<IReadOnlyValueRegistry?, NodeId?> ToInternalIdResolver(TUserId userId);
 
     /// <summary>
     /// Registers a fully constructed node into the builder's node list.

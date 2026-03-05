@@ -49,7 +49,8 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
         TChoiceContent? choiceContent = default,
         IAction? action = null)
     {
-        var choice = new Choice<TChoiceContent>(choiceContent, this.GetInternalId(targetUserId));
+        var targetResolver = this.ToInternalIdResolver(targetUserId);
+        var choice = new Choice<TChoiceContent>(choiceContent, targetResolver, action: action);
         this.AddDialogueNodeInternal(userId, dialogueContent, [choice]);
         return this;
     }
@@ -61,7 +62,7 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
         TChoiceContent? choiceContent = default,
         IAction? action = null)
     {
-        var choice = new Choice<TChoiceContent>(choiceContent);
+        var choice = new Choice<TChoiceContent>(choiceContent, action: action);
         this.AddDialogueNodeInternal(userId, dialogueContent, [choice]);
         return this;
     }
@@ -101,12 +102,6 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
     }
 
     /// <inheritdoc/>
-    public NodeId GetInternalId(TUserId userId)
-    {
-        return this.registry.GetOrRegister(userId);
-    }
-
-    /// <inheritdoc/>
     public void AddDialogueNodeInternal(
         TUserId userId,
         TDialogueContent dialogueContent,
@@ -115,6 +110,18 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
         NodeId id = this.GetInternalId(userId);
         var dialogueNode = new Node<TDialogueContent, TChoiceContent>(id, dialogueContent, choices);
         this.nodes.Add(dialogueNode);
+    }
+
+    /// <inheritdoc/>
+    public Func<IReadOnlyValueRegistry?, NodeId?> ToInternalIdResolver(TUserId userId)
+    {
+        NodeId internalId = this.GetInternalId(userId);
+        return _ => internalId;
+    }
+
+    private NodeId GetInternalId(TUserId userId)
+    {
+        return this.registry.GetOrRegister(userId);
     }
 
     /// <summary>
@@ -158,8 +165,8 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
             ICondition? condition = null,
             IAction? action = null)
         {
-            NodeId targetId = this.parent.GetInternalId(targetUserId);
-            var choice = new Choice<TChoiceContent>(choiceContent, targetId, condition, action);
+            var targetResolver = this.parent.ToInternalIdResolver(targetUserId);
+            var choice = new Choice<TChoiceContent>(choiceContent, targetResolver, condition, action);
             this.choices.Add(choice);
             return this;
         }
