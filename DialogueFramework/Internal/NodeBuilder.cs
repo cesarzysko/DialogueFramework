@@ -49,10 +49,24 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
         TChoiceContent? choiceContent = default,
         IAction? action = null)
     {
-        var targetResolver = this.ToInternalIdResolver(targetUserId);
-        var choice = new Choice<TChoiceContent>(choiceContent, targetResolver, action: action);
-        this.AddDialogueNodeInternal(userId, dialogueContent, [choice]);
-        return this;
+        var targetResolver = this.ToTargetResolver(targetUserId);
+        return this.AddLinearOrTerminalNode(userId, dialogueContent, choiceContent, targetResolver, action: action);
+    }
+
+    /// <inheritdoc/>
+    public ILastTargetResolverBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> AddDynamicLinearNode(
+        TUserId userId,
+        TDialogueContent dialogueContent,
+        TChoiceContent? choiceContent = default,
+        IAction? action = null)
+    {
+        var choiceBuilder = new ChoiceBuilder(this, userId, dialogueContent);
+        return new LastTargetResolverBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent>(
+            choiceBuilder,
+            this.GetNodeId,
+            choiceContent,
+            null,
+            action);
     }
 
     /// <inheritdoc/>
@@ -62,9 +76,7 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
         TChoiceContent? choiceContent = default,
         IAction? action = null)
     {
-        var choice = new Choice<TChoiceContent>(choiceContent, action: action);
-        this.AddDialogueNodeInternal(userId, dialogueContent, [choice]);
-        return this;
+        return this.AddLinearOrTerminalNode(userId, dialogueContent, choiceContent, null, action: action);
     }
 
     /// <inheritdoc/>
@@ -97,31 +109,46 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
             throw new InvalidOperationException(msg, nodeTargetException);
         }
 
-        NodeId startNodeId = this.GetInternalId(startNode);
+        NodeId startNodeId = this.GetNodeId(startNode);
         return new Runner<TRegistryKey, TDialogueContent, TChoiceContent>(graph, valueRegistry, startNodeId);
     }
 
     /// <inheritdoc/>
-    public void AddDialogueNodeInternal(
+    public void AddNodeInternal(
         TUserId userId,
         TDialogueContent dialogueContent,
-        IReadOnlyList<Choice<TChoiceContent>> choices)
+        IReadOnlyList<IChoice<TChoiceContent>> choices)
     {
-        NodeId id = this.GetInternalId(userId);
+        NodeId id = this.GetNodeId(userId);
         var dialogueNode = new Node<TDialogueContent, TChoiceContent>(id, dialogueContent, choices);
         this.nodes.Add(dialogueNode);
     }
 
     /// <inheritdoc/>
-    public Func<IReadOnlyValueRegistry?, NodeId?> ToInternalIdResolver(TUserId userId)
+    public ITargetResolver ToTargetResolver(TUserId userId)
     {
-        NodeId internalId = this.GetInternalId(userId);
-        return _ => internalId;
+        NodeId internalId = this.GetNodeId(userId);
+        TargetEntry entry = new TargetEntry(null, internalId);
+        ITargetResolver resolver = new TargetResolver([entry]);
+        return resolver;
     }
 
-    private NodeId GetInternalId(TUserId userId)
+    /// <inheritdoc/>
+    public NodeId GetNodeId(TUserId userId)
     {
         return this.registry.GetOrRegister(userId);
+    }
+
+    private NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> AddLinearOrTerminalNode(
+        TUserId userId,
+        TDialogueContent dialogueContent,
+        TChoiceContent? choiceContent,
+        ITargetResolver? targetResolver,
+        IAction? action)
+    {
+        var choice = new Choice<TChoiceContent>(choiceContent, targetResolver, action: action);
+        this.AddNodeInternal(userId, dialogueContent, [choice]);
+        return this;
     }
 
     /// <summary>
@@ -134,7 +161,7 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
         private readonly INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> parent;
         private readonly TUserId userId;
         private readonly TDialogueContent dialogueContent;
-        private readonly List<Choice<TChoiceContent>> choices = [];
+        private readonly List<IChoice<TChoiceContent>> choices = [];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ChoiceBuilder"/> class.
@@ -165,10 +192,22 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
             ICondition? condition = null,
             IAction? action = null)
         {
-            var targetResolver = this.parent.ToInternalIdResolver(targetUserId);
-            var choice = new Choice<TChoiceContent>(choiceContent, targetResolver, condition, action);
-            this.choices.Add(choice);
-            return this;
+            var targetResolver = this.parent.ToTargetResolver(targetUserId);
+            return this.AddChoice(choiceContent, targetResolver, condition, action);
+        }
+
+        /// <inheritdoc/>
+        public ITargetResolverBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> DynamicChoice(
+            TChoiceContent choiceContent,
+            ICondition? condition = null,
+            IAction? action = null)
+        {
+            return new TargetResolverBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent>(
+                this,
+                this.parent.GetNodeId,
+                choiceContent,
+                condition,
+                action);
         }
 
         /// <inheritdoc/>
@@ -177,9 +216,7 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
             ICondition? condition = null,
             IAction? action = null)
         {
-            var choice = new Choice<TChoiceContent>(choiceContent, null, condition, action);
-            this.choices.Add(choice);
-            return this;
+            return this.AddChoice(choiceContent, null, condition, action);
         }
 
         /// <inheritdoc/>
@@ -190,8 +227,21 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
             IAction? action = null)
         {
             this.Choice(targetUserId, choiceContent, condition, action);
-            this.parent.AddDialogueNodeInternal(this.userId, this.dialogueContent, this.choices);
-            return this.parent;
+            return this.EndNode();
+        }
+
+        /// <inheritdoc/>
+        public ILastTargetResolverBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> LastDynamicChoice(
+            TChoiceContent choiceContent,
+            ICondition? condition = null,
+            IAction? action = null)
+        {
+            return new LastTargetResolverBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent>(
+                this,
+                this.parent.GetNodeId,
+                choiceContent,
+                condition,
+                action);
         }
 
         /// <inheritdoc/>
@@ -201,8 +251,35 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
             IAction? action = null)
         {
             this.NoTargetChoice(choiceContent, condition, action);
-            this.parent.AddDialogueNodeInternal(this.userId, this.dialogueContent, this.choices);
+            return this.EndNode();
+        }
+
+        /// <inheritdoc/>
+        public void AddChoiceInternal(
+            TChoiceContent? content,
+            ITargetResolver? targetResolver = null,
+            ICondition? condition = null,
+            IAction? action = null)
+        {
+            this.AddChoice(content, targetResolver, condition, action);
+        }
+
+        /// <inheritdoc/>
+        public INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> EndNode()
+        {
+            this.parent.AddNodeInternal(this.userId, this.dialogueContent, this.choices);
             return this.parent;
+        }
+
+        private ChoiceBuilder AddChoice(
+            TChoiceContent? content,
+            ITargetResolver? targetResolver = null,
+            ICondition? condition = null,
+            IAction? action = null)
+        {
+            var choice = new Choice<TChoiceContent>(content, targetResolver, condition, action);
+            this.choices.Add(choice);
+            return this;
         }
     }
 }

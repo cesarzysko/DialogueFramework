@@ -13,6 +13,8 @@ namespace DialogueFramework;
 internal sealed class Choice<TContent>
     : IChoice<TContent>
 {
+    private readonly ITargetResolver targetResolver;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Choice{TContent}"/> class.
     /// </summary>
@@ -20,7 +22,7 @@ internal sealed class Choice<TContent>
     /// The data to display when presenting this choice to the user.
     /// </param>
     /// <param name="targetResolver">
-    /// Function to use to get the internal identifier of the node this choice leads to.
+    /// Resolver to use to get the internal identifier of the node this choice leads to.
     /// </param>
     /// <param name="condition">
     /// The predicate evaluated to determine whether this choice is available.
@@ -30,12 +32,12 @@ internal sealed class Choice<TContent>
     /// </param>
     internal Choice(
         TContent? content,
-        Func<IReadOnlyValueRegistry?, NodeId?>? targetResolver = null,
+        ITargetResolver? targetResolver,
         ICondition? condition = null,
         IAction? action = null)
     {
         this.Content = content;
-        this.TargetResolver = targetResolver;
+        this.targetResolver = targetResolver ?? new TargetResolver();
         this.Condition = condition;
         this.Action = action;
     }
@@ -49,11 +51,15 @@ internal sealed class Choice<TContent>
     /// <inheritdoc/>
     public IAction? Action { get; }
 
-    private Func<IReadOnlyValueRegistry?, NodeId?>? TargetResolver { get; }
-
     /// <inheritdoc/>
     public NodeId? GetTarget(IReadOnlyValueRegistry? valueRegistry)
     {
-        return this.TargetResolver?.Invoke(valueRegistry) ?? null;
+        return this.targetResolver.Resolve(valueRegistry);
+    }
+
+    /// <inheritdoc/>
+    public IReadOnlyList<NodeId?> GetAllTargets()
+    {
+        return this.targetResolver.GetAllTargets();
     }
 }

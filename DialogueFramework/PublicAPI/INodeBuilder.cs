@@ -53,6 +53,33 @@ public interface INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceCo
         IAction? action = null);
 
     /// <summary>
+    /// Creates a dialogue node with a single choice leading to another dialogue node.
+    /// </summary>
+    /// <param name="userId">
+    /// A unique user-defined identifier for this node.
+    /// </param>
+    /// <param name="dialogueContent">
+    /// The data to display when the runner arrives at this node.
+    /// </param>
+    /// <param name="targetResolver">
+    /// The target resolver used to get the identifier of the node to advance to when the choice is selected.
+    /// </param>
+    /// <param name="choiceContent">
+    /// Optional data to display for the single choice.
+    /// </param>
+    /// <param name="action">
+    /// An optional effect to execute when the choice is selected.
+    /// </param>
+    /// <returns>
+    /// This builder instance, enabling method chaining.
+    /// </returns>
+    public ILastTargetResolverBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceContent> AddDynamicLinearNode(
+        TUserId userId,
+        TDialogueContent dialogueContent,
+        TChoiceContent? choiceContent = default,
+        IAction? action = null);
+
+    /// <summary>
     /// Adds a node with a single choice that ends the dialogue rather than advancing to another node.
     /// </summary>
     /// <param name="userId">
@@ -113,7 +140,7 @@ public interface INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceCo
         TUserId startNode);
 
     /// <summary>
-    /// Returns a function which returns the internal <see cref="NodeId"/> assigned to the given user-defined
+    /// Returns a target resolver which returns the internal <see cref="NodeId"/> assigned to the given user-defined
     /// identifier, registering a new one if the identifier has not been seen before.
     /// </summary>
     /// <param name="userId">
@@ -122,7 +149,7 @@ public interface INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceCo
     /// <returns>
     /// The function returning the corresponding internal <see cref="NodeId"/>.
     /// </returns>
-    internal Func<IReadOnlyValueRegistry?, NodeId?> ToInternalIdResolver(TUserId userId);
+    internal ITargetResolver ToTargetResolver(TUserId userId);
 
     /// <summary>
     /// Registers a fully constructed node into the builder's node list.
@@ -136,8 +163,10 @@ public interface INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceCo
     /// <param name="choices">
     /// The ordered list of choices attached to the node.
     /// </param>
-    internal void AddDialogueNodeInternal(
+    internal void AddNodeInternal(
         TUserId userId,
         TDialogueContent dialogueContent,
-        IReadOnlyList<Choice<TChoiceContent>> choices);
+        IReadOnlyList<IChoice<TChoiceContent>> choices);
+
+    internal NodeId GetNodeId(TUserId userId);
 }

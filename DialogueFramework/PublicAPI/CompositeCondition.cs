@@ -17,9 +17,14 @@ public class CompositeCondition : ICondition
     /// <param name="conditions">
     /// The conditions to check in order when this composite condition is checked.
     /// </param>
+    /// <exception cref="ArgumentException">
+    /// Throws if <see cref="conditions"/> don't contain any condition.
+    /// </exception>
     public CompositeCondition(params ICondition[] conditions)
     {
-        this.conditions = conditions;
+        this.conditions = conditions is { Length: > 0 }
+            ? conditions
+            : throw new ArgumentException("A composite condition must contain at least one condition.");
     }
 
     /// <inheritdoc/>

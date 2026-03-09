@@ -17,9 +17,14 @@ public class CompositeAction : IAction
     /// <param name="actions">
     /// The actions to execute in order when this composite action is triggered.
     /// </param>
+    /// <exception cref="ArgumentException">
+    /// Throws if <see cref="actions"/> don't contain any action.
+    /// </exception>
     public CompositeAction(params IAction[] actions)
     {
-        this.actions = actions;
+        this.actions = actions is { Length: > 0 }
+            ? actions
+            : throw new ArgumentException("A composite action must contain at least one action.");
     }
 
     /// <inheritdoc/>

@@ -57,7 +57,8 @@ public interface IRunner<out TDialogueContent, TChoiceContent>
     /// or when the specified condition is not met.
     /// </exception>
     /// <exception cref="InvalidOperationException">
-    /// Thrown when the choice's target node is not found in the dialogue graph.
+    /// Thrown when the choice's target node is not found in the dialogue graph;
+    /// or when the runner already reached a terminal node.
     /// </exception>
     public bool Choose(IChoice<TChoiceContent> choice);
 

@@ -34,7 +34,7 @@ internal sealed class Node<TDialogueContent, TChoiceContent>
     internal Node(
         NodeId id,
         TDialogueContent content,
-        IReadOnlyList<Choice<TChoiceContent>> choices)
+        IReadOnlyList<IChoice<TChoiceContent>> choices)
     {
         this.Id = id;
         this.Content = content;

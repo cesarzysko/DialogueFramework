@@ -37,4 +37,12 @@ public interface IChoice<out TContent>
     /// The id of the target node this choice leads to.
     /// </returns>
     internal NodeId? GetTarget(IReadOnlyValueRegistry? valueRegistry);
+
+    /// <summary>
+    /// Returns all possible targets, regardless of whether their conditions are met.
+    /// </summary>
+    /// <returns>
+    /// List of all possible targets for this choice.
+    /// </returns>
+    internal IReadOnlyList<NodeId?> GetAllTargets();
 }

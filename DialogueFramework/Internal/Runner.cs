@@ -23,7 +23,7 @@ internal sealed class Runner<TRegistryKey, TDialogueContent, TChoiceContent>
 {
     private readonly Graph<TDialogueContent, TChoiceContent> graph;
     private readonly IValueRegistry<TRegistryKey>? valueRegistry;
-    private readonly NodeId startNode;
+    private readonly NodeId initialNodeId;
     private bool reachedTerminalNode;
 
     /// <summary>
@@ -35,18 +35,18 @@ internal sealed class Runner<TRegistryKey, TDialogueContent, TChoiceContent>
     /// <param name="valueRegistry">
     /// The registry made available to conditions and actions.
     /// </param>
-    /// <param name="startNode">
+    /// <param name="initialNodeId">
     /// The internal identifier of the node at which traversal should begin.
     /// </param>
     internal Runner(
         Graph<TDialogueContent, TChoiceContent> graph,
         IValueRegistry<TRegistryKey>? valueRegistry,
-        NodeId startNode)
+        NodeId initialNodeId)
     {
-        this.Current = graph.GetDialogueNode(startNode);
+        this.Current = graph.GetDialogueNode(initialNodeId);
         this.graph = graph;
         this.valueRegistry = valueRegistry;
-        this.startNode = startNode;
+        this.initialNodeId = initialNodeId;
     }
 
     /// <inheritdoc/>
@@ -56,7 +56,7 @@ internal sealed class Runner<TRegistryKey, TDialogueContent, TChoiceContent>
     public void Reset()
     {
         this.reachedTerminalNode = false;
-        this.Current = this.graph.GetDialogueNode(this.startNode);
+        this.Current = this.graph.GetDialogueNode(this.initialNodeId);
     }
 
     /// <inheritdoc/>
@@ -120,6 +120,7 @@ internal sealed class Runner<TRegistryKey, TDialogueContent, TChoiceContent>
         }
         catch (KeyNotFoundException ex)
         {
+            // This should not happen as the graph already validates whether all choice targets are valid.
             throw new InvalidOperationException($"Target node {target.Value.Value} not found in graph.", ex);
         }
     }

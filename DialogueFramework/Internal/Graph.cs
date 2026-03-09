@@ -79,7 +79,7 @@ internal sealed class Graph<TDialogueContent, TChoiceContent>
 
         NodeId[] missingTargets = graph.Values
             .SelectMany(node => node.Choices)
-            .Select(choice => choice.GetTarget(null))
+            .SelectMany(choice => choice.GetAllTargets())
             .Where(t => t != null && !graph.ContainsKey(t.Value.Value))
             .Select(t => t!.Value)
             .ToArray();
