@@ -26,7 +26,7 @@ This project is built as a programming skill–polishing exercise, focusing on c
   - Dialogue Runner
 
 - **Frontend Layer**
-  - Console (Text Adventure sample)
+  - Console (Text Adventure sample, will be later separated into it's own, more advanced, project)
   - Unity (planned)
   - MonoGame (planned)
 
