@@ -30,7 +30,7 @@ public static class AdventureProvider
     /// <returns>
     /// The runner instance for the adventure.
     /// </returns>
-    public static IRunner<string, string> BuildAdventure(SceneId startingSceneId = SceneId.Intro, ILogger? logger = null)
+    public static RunnerFacade<string, string> BuildAdventure(SceneId startingSceneId = SceneId.Intro, ILogger? logger = null)
     {
         return DialogueBuilderFactory.CreateBuilder<string, SceneId, string, string>(logger)
 

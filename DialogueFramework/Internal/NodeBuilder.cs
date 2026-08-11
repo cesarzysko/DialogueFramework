@@ -88,7 +88,7 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
     }
 
     /// <inheritdoc/>
-    public IRunner<TDialogueContent, TChoiceContent> BuildRunner(
+    public RunnerFacade<TDialogueContent, TChoiceContent> BuildRunner(
         IValueRegistry<TRegistryKey>? valueRegistry,
         TUserId startNode)
     {
@@ -110,7 +110,8 @@ internal sealed class NodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoi
         }
 
         NodeId startNodeId = this.GetNodeId(startNode);
-        return new Runner<TRegistryKey, TDialogueContent, TChoiceContent>(graph, valueRegistry, startNodeId);
+        var runner = new Runner<TRegistryKey, TDialogueContent, TChoiceContent>(graph, valueRegistry, startNodeId);
+        return new RunnerFacade<TDialogueContent, TChoiceContent>(runner);
     }
 
     /// <inheritdoc/>

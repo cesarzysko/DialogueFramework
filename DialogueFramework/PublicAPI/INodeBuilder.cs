@@ -135,7 +135,7 @@ public interface INodeBuilder<TRegistryKey, TUserId, TDialogueContent, TChoiceCo
     /// An <see cref="IRunner{TDialogueContent,TChoiceContent}"/> ready to traverse the
     /// constructed graph.
     /// </returns>
-    public IRunner<TDialogueContent, TChoiceContent> BuildRunner(
+    public RunnerFacade<TDialogueContent, TChoiceContent> BuildRunner(
         IValueRegistry<TRegistryKey>? valueRegistry,
         TUserId startNode);
 

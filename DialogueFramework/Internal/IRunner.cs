@@ -14,7 +14,7 @@ namespace DialogueFramework;
 /// <typeparam name="TChoiceContent">
 /// The type of displayable data carried by each dialogue choice.
 /// </typeparam>
-public interface IRunner<out TDialogueContent, TChoiceContent>
+internal interface IRunner<out TDialogueContent, TChoiceContent>
 {
     /// <summary>
     /// Gets the node the runner is currently positioned on.

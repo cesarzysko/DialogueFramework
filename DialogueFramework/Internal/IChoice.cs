@@ -10,7 +10,7 @@ namespace DialogueFramework;
 /// <typeparam name="TContent">
 /// The type of displayable data attached to the choice.
 /// </typeparam>
-public interface IChoice<out TContent>
+internal interface IChoice<out TContent>
 {
     /// <summary>
     /// Gets the data to display when presenting this choice to the user.
@@ -20,12 +20,12 @@ public interface IChoice<out TContent>
     /// <summary>
     /// Gets the condition that must be satisfied for this choice to appear as available.
     /// </summary>
-    internal ICondition? Condition { get; }
+    public ICondition? Condition { get; }
 
     /// <summary>
     /// Gets the action executed by the runner when this choice is selected.
     /// </summary>
-    internal IAction? Action { get; }
+    public IAction? Action { get; }
 
     /// <summary>
     /// Gets the internal identifier of the node this choice leads to.
@@ -36,7 +36,7 @@ public interface IChoice<out TContent>
     /// <returns>
     /// The id of the target node this choice leads to.
     /// </returns>
-    internal NodeId? GetTarget(IReadOnlyValueRegistry? valueRegistry);
+    public NodeId? GetTarget(IReadOnlyValueRegistry? valueRegistry);
 
     /// <summary>
     /// Returns all possible targets, regardless of whether their conditions are met.
@@ -44,5 +44,5 @@ public interface IChoice<out TContent>
     /// <returns>
     /// List of all possible targets for this choice.
     /// </returns>
-    internal IReadOnlyList<NodeId?> GetAllTargets();
+    public IReadOnlyList<NodeId?> GetAllTargets();
 }

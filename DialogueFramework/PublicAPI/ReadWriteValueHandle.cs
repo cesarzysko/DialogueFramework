@@ -13,6 +13,10 @@ namespace DialogueFramework;
 /// </typeparam>
 public sealed class ReadWriteValueHandle<TValue> : ReadOnlyValueHandle<TValue>
 {
+    private readonly ReadOnlyValueHandle<TValue> valueHandle;
+
+    // TODO: Remove base type inheritance.
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ReadWriteValueHandle{TValue}"/> class.
     /// </summary>
@@ -22,11 +26,12 @@ public sealed class ReadWriteValueHandle<TValue> : ReadOnlyValueHandle<TValue>
     internal ReadWriteValueHandle(TValue value)
         : base(value)
     {
+        this.valueHandle = new ReadOnlyValueHandle<TValue>(value);
     }
 
     /// <inheritdoc cref="ReadOnlyValueHandle{TValue}.WriteValue"/>
     internal void Write(TValue value)
     {
-        this.WriteValue(value);
+        this.valueHandle.WriteValue(value);
     }
 }

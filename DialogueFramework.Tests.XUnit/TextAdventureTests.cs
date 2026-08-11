@@ -39,7 +39,7 @@ public class TextAdventureTests
         int n = choices.Length;
         while (++i < n)
         {
-            this.testOutputHelper.WriteLine(adventure.Current?.Content);
+            this.testOutputHelper.WriteLine(adventure.CurrentContent);
 
             var allChoices = adventure.GetChoices();
             var availableChoices = adventure.GetAvailableChoices();
@@ -52,12 +52,12 @@ public class TextAdventureTests
                     ? "END OF STORY"
                     : choice.Content;
                 this.testOutputHelper.WriteLine(
-                    availableChoices.Contains(choice)
+                    availableChoices.Any(ch => ch.Content == choice.Content)
                         ? $"{j + 1}. {choiceContent}"
                         : $"{j + 1}. {choiceContent} [NOT AVAILABLE]");
             }
 
-            var selectedChoice = allChoices[choices[i]];
+            var selectedChoice = availableChoices.First(ch => ch.Content == allChoices[choices[i]].Content);
             var selectedChoiceContent = string.IsNullOrWhiteSpace(selectedChoice.Content)
                 ? "END OF STORY"
                 : selectedChoice.Content;

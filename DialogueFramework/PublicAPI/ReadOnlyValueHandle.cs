@@ -15,6 +15,8 @@ public class ReadOnlyValueHandle<TValue>
 {
     private readonly ValueWrapper<TValue> wrappedValue;
 
+    // TODO: Make class sealed
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ReadOnlyValueHandle{TValue}"/> class.
     /// </summary>
@@ -43,7 +45,7 @@ public class ReadOnlyValueHandle<TValue>
     /// <param name="value">
     /// The new value stored by the handle.
     /// </param>
-    private protected void WriteValue(TValue value)
+    internal void WriteValue(TValue value)
     {
         this.wrappedValue.Value = value;
     }
